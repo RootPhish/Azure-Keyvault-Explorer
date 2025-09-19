@@ -1,6 +1,6 @@
-﻿namespace KeyVaultExplorer
+﻿namespace AzureKeyvaultExplorer
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             btnLoadSubs = new Button();
             lbVaults = new ListBox();
             lbSecrets = new ListBox();
@@ -40,9 +40,9 @@
             label3 = new Label();
             label4 = new Label();
             btnEye = new Button();
-            imageList1 = new ImageList(components);
-            imageList2 = new ImageList(components);
             btnCopy = new Button();
+            imageList2 = new ImageList(components);
+            imageList1 = new ImageList(components);
             SuspendLayout();
             // 
             // btnLoadSubs
@@ -139,22 +139,6 @@
             btnEye.TabStop = false;
             btnEye.UseVisualStyleBackColor = true;
             // 
-            // imageList1
-            // 
-            imageList1.ColorDepth = ColorDepth.Depth32Bit;
-            imageList1.ImageStream = (ImageListStreamer)resources.GetObject("imageList1.ImageStream");
-            imageList1.TransparentColor = Color.Transparent;
-            imageList1.Images.SetKeyName(0, "Ic_visibility_48px.svg.png");
-            imageList1.Images.SetKeyName(1, "Ic_visibility_off_48px.svg.png");
-            // 
-            // imageList2
-            // 
-            imageList2.ColorDepth = ColorDepth.Depth32Bit;
-            imageList2.ImageStream = (ImageListStreamer)resources.GetObject("imageList2.ImageStream");
-            imageList2.TransparentColor = Color.Transparent;
-            imageList2.Images.SetKeyName(0, "Ic_content_copy_48px.svg.png");
-            imageList2.Images.SetKeyName(1, "Ic_done_48px.svg.png");
-            // 
             // btnCopy
             // 
             btnCopy.BackgroundImageLayout = ImageLayout.Zoom;
@@ -168,6 +152,22 @@
             btnCopy.TabIndex = 16;
             btnCopy.TabStop = false;
             btnCopy.UseVisualStyleBackColor = true;
+            // 
+            // imageList2
+            // 
+            imageList2.ColorDepth = ColorDepth.Depth32Bit;
+            imageList2.ImageStream = (ImageListStreamer)resources.GetObject("imageList2.ImageStream");
+            imageList2.TransparentColor = Color.Transparent;
+            imageList2.Images.SetKeyName(0, "Ic_content_copy_48px.svg.png");
+            imageList2.Images.SetKeyName(1, "Ic_done_48px.svg.png");
+            // 
+            // imageList1
+            // 
+            imageList1.ColorDepth = ColorDepth.Depth32Bit;
+            imageList1.ImageStream = (ImageListStreamer)resources.GetObject("imageList1.ImageStream");
+            imageList1.TransparentColor = Color.Transparent;
+            imageList1.Images.SetKeyName(0, "Ic_visibility_48px.svg.png");
+            imageList1.Images.SetKeyName(1, "Ic_visibility_off_48px.svg.png");
             // 
             // Form1
             // 
@@ -202,8 +202,8 @@
         private Label label3;
         private Label label4;
         private Button btnEye;
+        private Button btnCopy;
         private ImageList imageList1;
         private ImageList imageList2;
-        private Button btnCopy;
     }
 }

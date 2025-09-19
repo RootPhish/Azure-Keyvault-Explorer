@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KeyVaultExplorer.Properties {
+namespace AzureKeyvaultExplorer.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace KeyVaultExplorer.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KeyVaultExplorer.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AzureKeyvaultExplorer.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,26 +57,6 @@ namespace KeyVaultExplorer.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Ic_visibility_48px_svg {
-            get {
-                object obj = ResourceManager.GetObject("Ic_visibility_48px.svg", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Ic_visibility_off_48px_svg {
-            get {
-                object obj = ResourceManager.GetObject("Ic_visibility_off_48px.svg", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

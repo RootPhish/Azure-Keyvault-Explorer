@@ -6,9 +6,9 @@ using Azure.ResourceManager.KeyVault;
 using Azure.Security.KeyVault.Secrets;
 using System.Runtime.InteropServices;
 
-namespace KeyVaultExplorer
+namespace AzureKeyvaultExplorer
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         public const uint WDA_NONE = 0;
         public const uint WDA_MONITOR = 1;
@@ -19,7 +19,7 @@ namespace KeyVaultExplorer
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
