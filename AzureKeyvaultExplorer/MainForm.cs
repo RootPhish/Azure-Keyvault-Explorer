@@ -82,10 +82,6 @@ namespace AzureKeyvaultExplorer
                 {
                     MessageBox.Show("No Subscriptions found for your account.", "Info");
                 }
-                else
-                {
-                    lbSubs.SelectedIndex = 0;
-                }
             }
             catch (Exception ex)
             {
@@ -121,7 +117,7 @@ namespace AzureKeyvaultExplorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load vaults:\n{ex.Message}", "Error");
+                MessageBox.Show($"Failed to load vaults for selected subscription.\nDo you have the correct authorizations?", "Error");
             }
         }
 
