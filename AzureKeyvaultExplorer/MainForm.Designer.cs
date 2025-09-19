@@ -40,9 +40,9 @@
             label3 = new Label();
             label4 = new Label();
             btnEye = new Button();
+            imageList1 = new ImageList(components);
             btnCopy = new Button();
             imageList2 = new ImageList(components);
-            imageList1 = new ImageList(components);
             SuspendLayout();
             // 
             // btnLoadSubs
@@ -139,6 +139,14 @@
             btnEye.TabStop = false;
             btnEye.UseVisualStyleBackColor = true;
             // 
+            // imageList1
+            // 
+            imageList1.ColorDepth = ColorDepth.Depth32Bit;
+            imageList1.ImageStream = (ImageListStreamer)resources.GetObject("imageList1.ImageStream");
+            imageList1.TransparentColor = Color.Transparent;
+            imageList1.Images.SetKeyName(0, "Ic_visibility_48px.svg.png");
+            imageList1.Images.SetKeyName(1, "Ic_visibility_off_48px.svg.png");
+            // 
             // btnCopy
             // 
             btnCopy.BackgroundImageLayout = ImageLayout.Zoom;
@@ -161,15 +169,7 @@
             imageList2.Images.SetKeyName(0, "Ic_content_copy_48px.svg.png");
             imageList2.Images.SetKeyName(1, "Ic_done_48px.svg.png");
             // 
-            // imageList1
-            // 
-            imageList1.ColorDepth = ColorDepth.Depth32Bit;
-            imageList1.ImageStream = (ImageListStreamer)resources.GetObject("imageList1.ImageStream");
-            imageList1.TransparentColor = Color.Transparent;
-            imageList1.Images.SetKeyName(0, "Ic_visibility_48px.svg.png");
-            imageList1.Images.SetKeyName(1, "Ic_visibility_off_48px.svg.png");
-            // 
-            // Form1
+            // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -185,8 +185,8 @@
             Controls.Add(lbSecrets);
             Controls.Add(lbVaults);
             Controls.Add(btnLoadSubs);
-            Name = "Form1";
-            Text = "Form1";
+            Name = "MainForm";
+            Text = "Azure Keyvault Explorer";
             ResumeLayout(false);
             PerformLayout();
         }

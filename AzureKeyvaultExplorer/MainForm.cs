@@ -93,6 +93,7 @@ namespace AzureKeyvaultExplorer
         {
             try
             {
+                lbSubs.Enabled = false;
                 lbVaults.Items.Clear();
                 lbSecrets.Items.Clear();
                 txtValue.Clear();
@@ -119,12 +120,17 @@ namespace AzureKeyvaultExplorer
             {
                 MessageBox.Show($"Failed to load vaults for selected subscription.\nDo you have the correct authorizations?", "Error");
             }
+            finally
+            {
+                lbSubs.Enabled = true;
+            }
         }
 
         private async Task LoadSecretsAsync()
         {
             try
             {
+                lbVaults.Enabled = false;
                 lbSecrets.Items.Clear();
                 txtValue.Clear();
                 if (lbVaults.SelectedItem is not VaultItem vault)
@@ -142,12 +148,17 @@ namespace AzureKeyvaultExplorer
             {
                 MessageBox.Show($"Failed to load secrets:\n{ex.Message}", "Error");
             }
+            finally
+            {
+                lbVaults.Enabled = true;
+            }
         }
 
         private async Task GetSecretValueAsync()
         {
             try
             {
+                lbSecrets.Enabled = false;
                 txtValue.Clear();
                 if (lbVaults.SelectedItem is not VaultItem vault)
                 {
@@ -171,6 +182,10 @@ namespace AzureKeyvaultExplorer
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to get secret value:\n{ex.Message}", "Error");
+            }
+            finally
+            {
+                lbSecrets.Enabled = true;
             }
         }
 
