@@ -43,6 +43,7 @@
             imageList1 = new ImageList(components);
             btnCopy = new Button();
             imageList2 = new ImageList(components);
+            textBox1 = new TextBox();
             SuspendLayout();
             // 
             // btnLoadSubs
@@ -79,6 +80,7 @@
             txtValue.Size = new Size(219, 23);
             txtValue.TabIndex = 8;
             txtValue.UseSystemPasswordChar = true;
+            txtValue.ReadOnly = true;
             // 
             // lbSubs
             // 
@@ -101,7 +103,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(208, 75);
+            label2.Location = new Point(208, 50);
             label2.Name = "label2";
             label2.Size = new Size(60, 15);
             label2.TabIndex = 12;
@@ -169,11 +171,20 @@
             imageList2.Images.SetKeyName(0, "Ic_content_copy_48px.svg.png");
             imageList2.Images.SetKeyName(1, "Ic_done_48px.svg.png");
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(208, 68);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(190, 23);
+            textBox1.TabIndex = 17;
+            textBox1.TextChanged += textBox1_TextChanged;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(961, 450);
+            Controls.Add(textBox1);
             Controls.Add(btnCopy);
             Controls.Add(btnEye);
             Controls.Add(label4);
@@ -187,6 +198,7 @@
             Controls.Add(btnLoadSubs);
             Name = "MainForm";
             Text = "Azure Keyvault Explorer";
+            KeyDown += MainForm_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -205,5 +217,6 @@
         private Button btnCopy;
         private ImageList imageList1;
         private ImageList imageList2;
+        private TextBox textBox1;
     }
 }

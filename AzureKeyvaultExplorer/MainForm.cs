@@ -1,6 +1,5 @@
 using Azure;
 using Azure.Core;
-using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.KeyVault;
 using Azure.Security.KeyVault.Secrets;
@@ -39,7 +38,7 @@ namespace AzureKeyvaultExplorer
             SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
         }
 
-        private readonly TokenCredential _credential = new InteractiveBrowserCredential();
+        private TokenCredential _credential;
 
         private class SubItem
         {
@@ -55,11 +54,14 @@ namespace AzureKeyvaultExplorer
             public string VaultUri { get; set; } = "";
             public Azure.Core.ResourceIdentifier ResourceId { get; set; }
 
-            public override string ToString() => Name; // display in ComboBox
+            public override string ToString() => Name;
         }
 
         private async Task LoadSubsAsync()
         {
+            _credential = new MsalTokenCredential(System.Configuration.ConfigurationManager.AppSettings["ClientID"] ?? "",
+                                                  System.Configuration.ConfigurationManager.AppSettings["TenantID"] ?? "");
+
             try
             {
                 lbSubs.Items.Clear();
@@ -89,6 +91,8 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        List<VaultItem> vaultItems = new List<VaultItem>();
+
         private async Task LoadVaultsAsync()
         {
             try
@@ -108,12 +112,17 @@ namespace AzureKeyvaultExplorer
 
                 await foreach (var kv in kvCollection)
                 {
-                    lbVaults.Items.Add(new VaultItem
+                    VaultItem item = new VaultItem
                     {
                         Name = kv.Data.Name,
                         ResourceId = kv.Id,
                         VaultUri = kv.Data.Properties.VaultUri.ToString()
-                    });
+                    };
+                    if (kv.Data.Name.Contains(textBox1.Text, StringComparison.OrdinalIgnoreCase))
+                    {
+                        lbVaults.Items.Add(item);
+                    }
+                    vaultItems.Add(item);
                 }
             }
             catch (Exception ex)
@@ -142,6 +151,10 @@ namespace AzureKeyvaultExplorer
                 await foreach (SecretProperties props in secretClient.GetPropertiesOfSecretsAsync())
                 {
                     lbSecrets.Items.Add(props.Name);
+                }
+                if (lbSecrets.Items.Count != 0)
+                {
+                    lbSecrets.SelectedIndex = 0;
                 }
             }
             catch (Exception ex)
@@ -213,5 +226,29 @@ namespace AzureKeyvaultExplorer
             btnEye.ImageIndex = (btnEye.ImageIndex + 1) % 2;
         }
 
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            lbVaults.Items.Clear();
+            foreach (string str in vaultItems.Select(v => v.Name).Where(n => n.Contains(textBox1.Text, StringComparison.OrdinalIgnoreCase)))
+            {
+                lbVaults.Items.Add(vaultItems.First(v => v.Name == str));
+            }
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.C))
+            {
+                _ = CopyPasswordAsync();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control & e.KeyCode == Keys.C)
+            {
+                _ = CopyPasswordAsync();
+            }
+        }
     }
 }
