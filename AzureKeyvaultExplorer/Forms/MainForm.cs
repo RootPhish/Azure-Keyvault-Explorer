@@ -53,7 +53,7 @@ namespace AzureKeyvaultExplorer
         private class SubItem
         {
             public string Name { get; set; } = "";
-            public Azure.Core.ResourceIdentifier ResourceId { get; set; }
+            public Azure.Core.ResourceIdentifier? ResourceId { get; set; }
 
             public override string ToString() => Name;
         }
@@ -62,7 +62,7 @@ namespace AzureKeyvaultExplorer
         {
             public string Name { get; set; } = "";
             public string VaultUri { get; set; } = "";
-            public Azure.Core.ResourceIdentifier ResourceId { get; set; }
+            public Azure.Core.ResourceIdentifier? ResourceId { get; set; }
 
             public override string ToString() => Name;
         }
@@ -124,7 +124,7 @@ namespace AzureKeyvaultExplorer
                     return;
                 }
                 var arm = new ArmClient(_credential);
-                var sub = arm.GetSubscriptionResource(new ResourceIdentifier($"/subscriptions/{subItem.ResourceId.Name}"));
+                var sub = arm.GetSubscriptionResource(new ResourceIdentifier($"/subscriptions/{subItem.ResourceId?.Name}"));
                 var kvCollection = sub.GetKeyVaultsAsync();
 
                 progressBar.Style = ProgressBarStyle.Marquee;
