@@ -34,17 +34,14 @@
             imageList2 = new ImageList(components);
             menuStrip1 = new MenuStrip();
             settingsToolStripMenuItem = new ToolStripMenuItem();
-            loadSubscriptionsToolStripMenuItem = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
             preferencesToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            connectToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1 = new TableLayoutPanel();
             lblValue = new Label();
             lblSecrets = new Label();
             lblKeyvaults = new Label();
-            textBox1 = new TextBox();
-            lbVaults = new ListBox();
             lbSubs = new ListBox();
             lbSecrets = new ListBox();
             panel2 = new Panel();
@@ -52,9 +49,17 @@
             btnEye = new Button();
             txtValue = new TextBox();
             lblSubscriptions = new Label();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            textBox1 = new TextBox();
+            lbVaults = new ListBox();
+            statusStrip1 = new StatusStrip();
+            toolStripProgressBar1 = new ToolStripProgressBar();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // imageList1
@@ -75,7 +80,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, connectToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(961, 24);
@@ -84,40 +89,36 @@
             // 
             // settingsToolStripMenuItem
             // 
-            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadSubscriptionsToolStripMenuItem, toolStripSeparator1, preferencesToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { preferencesToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(37, 20);
             settingsToolStripMenuItem.Text = "File";
             // 
-            // loadSubscriptionsToolStripMenuItem
-            // 
-            loadSubscriptionsToolStripMenuItem.Name = "loadSubscriptionsToolStripMenuItem";
-            loadSubscriptionsToolStripMenuItem.Size = new Size(180, 22);
-            loadSubscriptionsToolStripMenuItem.Text = "Load Subscriptions";
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
-            // 
             // preferencesToolStripMenuItem
             // 
             preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            preferencesToolStripMenuItem.Size = new Size(180, 22);
+            preferencesToolStripMenuItem.Size = new Size(144, 22);
             preferencesToolStripMenuItem.Text = "Preferences...";
             preferencesToolStripMenuItem.Click += preferencesToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(177, 6);
+            toolStripSeparator2.Size = new Size(141, 6);
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(144, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // connectToolStripMenuItem
+            // 
+            connectToolStripMenuItem.Name = "connectToolStripMenuItem";
+            connectToolStripMenuItem.Size = new Size(64, 20);
+            connectToolStripMenuItem.Text = "Connect";
+            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
             // tableLayoutPanel1
             // 
@@ -129,17 +130,16 @@
             tableLayoutPanel1.Controls.Add(lblValue, 3, 0);
             tableLayoutPanel1.Controls.Add(lblSecrets, 2, 0);
             tableLayoutPanel1.Controls.Add(lblKeyvaults, 1, 0);
-            tableLayoutPanel1.Controls.Add(textBox1, 1, 1);
-            tableLayoutPanel1.Controls.Add(lbVaults, 1, 2);
             tableLayoutPanel1.Controls.Add(lbSubs, 0, 1);
             tableLayoutPanel1.Controls.Add(lbSecrets, 2, 1);
             tableLayoutPanel1.Controls.Add(panel2, 3, 1);
             tableLayoutPanel1.Controls.Add(lblSubscriptions, 0, 0);
+            tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 1, 1);
+            tableLayoutPanel1.Controls.Add(statusStrip1, 0, 2);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 24);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 3;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
@@ -179,25 +179,6 @@
             lblKeyvaults.Text = "Key Vaults";
             lblKeyvaults.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // textBox1
-            // 
-            textBox1.Dock = DockStyle.Top;
-            textBox1.Location = new Point(223, 33);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(214, 23);
-            textBox1.TabIndex = 26;
-            textBox1.TextChanged += textBox1_TextChanged;
-            // 
-            // lbVaults
-            // 
-            lbVaults.Dock = DockStyle.Fill;
-            lbVaults.FormattingEnabled = true;
-            lbVaults.ItemHeight = 15;
-            lbVaults.Location = new Point(223, 63);
-            lbVaults.Name = "lbVaults";
-            lbVaults.Size = new Size(214, 360);
-            lbVaults.TabIndex = 25;
-            // 
             // lbSubs
             // 
             lbSubs.Dock = DockStyle.Fill;
@@ -205,8 +186,7 @@
             lbSubs.ItemHeight = 15;
             lbSubs.Location = new Point(3, 33);
             lbSubs.Name = "lbSubs";
-            tableLayoutPanel1.SetRowSpan(lbSubs, 2);
-            lbSubs.Size = new Size(214, 390);
+            lbSubs.Size = new Size(214, 370);
             lbSubs.TabIndex = 24;
             // 
             // lbSecrets
@@ -216,8 +196,7 @@
             lbSecrets.ItemHeight = 15;
             lbSecrets.Location = new Point(443, 33);
             lbSecrets.Name = "lbSecrets";
-            tableLayoutPanel1.SetRowSpan(lbSecrets, 2);
-            lbSecrets.Size = new Size(214, 390);
+            lbSecrets.Size = new Size(214, 370);
             lbSecrets.TabIndex = 13;
             // 
             // panel2
@@ -228,8 +207,7 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(663, 33);
             panel2.Name = "panel2";
-            tableLayoutPanel1.SetRowSpan(panel2, 2);
-            panel2.Size = new Size(295, 390);
+            panel2.Size = new Size(295, 370);
             panel2.TabIndex = 23;
             // 
             // btnCopy
@@ -262,6 +240,7 @@
             // 
             // txtValue
             // 
+            txtValue.BackColor = SystemColors.Window;
             txtValue.Location = new Point(26, 23);
             txtValue.Name = "txtValue";
             txtValue.ReadOnly = true;
@@ -279,6 +258,59 @@
             lblSubscriptions.TabIndex = 27;
             lblSubscriptions.Text = "Subscriptions";
             lblSubscriptions.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.ColumnCount = 1;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel2.Controls.Add(textBox1, 0, 0);
+            tableLayoutPanel2.Controls.Add(lbVaults, 0, 1);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.Location = new Point(223, 33);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 2;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel2.Size = new Size(214, 370);
+            tableLayoutPanel2.TabIndex = 31;
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = AnchorStyles.Left;
+            textBox1.Location = new Point(3, 3);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(208, 23);
+            textBox1.TabIndex = 28;
+            // 
+            // lbVaults
+            // 
+            lbVaults.Dock = DockStyle.Fill;
+            lbVaults.FormattingEnabled = true;
+            lbVaults.ItemHeight = 15;
+            lbVaults.Location = new Point(3, 33);
+            lbVaults.Name = "lbVaults";
+            lbVaults.Size = new Size(208, 334);
+            lbVaults.TabIndex = 35;
+            // 
+            // statusStrip1
+            // 
+            tableLayoutPanel1.SetColumnSpan(statusStrip1, 4);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 406);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(961, 20);
+            statusStrip1.TabIndex = 32;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripProgressBar1
+            // 
+            toolStripProgressBar1.Name = "toolStripProgressBar1";
+            toolStripProgressBar1.Size = new Size(100, 14);
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(0, 15);
             // 
             // MainForm
             // 
@@ -298,6 +330,10 @@
             tableLayoutPanel1.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -309,8 +345,6 @@
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem preferencesToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
-        private ToolStripMenuItem loadSubscriptionsToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator1;
         private ToolStripSeparator toolStripSeparator2;
         private TableLayoutPanel tableLayoutPanel1;
         private ListBox lbSecrets;
@@ -318,12 +352,17 @@
         private Button btnCopy;
         private Button btnEye;
         private TextBox txtValue;
-        private TextBox textBox1;
-        private ListBox lbVaults;
         private ListBox lbSubs;
         private Label lblValue;
         private Label lblSecrets;
         private Label lblKeyvaults;
         private Label lblSubscriptions;
+        private ToolStripMenuItem connectToolStripMenuItem;
+        private TableLayoutPanel tableLayoutPanel2;
+        private ListBox lbVaults;
+        private TextBox textBox1;
+        private StatusStrip statusStrip1;
+        private ToolStripProgressBar toolStripProgressBar1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
     }
 }

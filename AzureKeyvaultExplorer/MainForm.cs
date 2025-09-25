@@ -26,17 +26,17 @@ namespace AzureKeyvaultExplorer
 
             btnEye.Click += (_, __) => ToggleReveal();
             btnCopy.Click += async (_, __) => await CopyPasswordAsync();
-            loadSubscriptionsToolStripMenuItem.Click += async (_, __) => await LoadSubsAsync();
+            connectToolStripMenuItem.Click += async (_, __) => await LoadSubsAsync();
             lbSubs.SelectedIndexChanged += async (_, __) => await LoadVaultsAsync();
             lbVaults.SelectedIndexChanged += async (_, __) => await LoadSecretsAsync();
             lbSecrets.SelectedIndexChanged += async (_, __) => await GetSecretValueAsync();
         }
 
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
-        }
+        //protected override void OnHandleCreated(EventArgs e)
+        //{
+        //    base.OnHandleCreated(e);
+        //    SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
+        //}
 
         private TokenCredential? _credential;
 
@@ -114,6 +114,9 @@ namespace AzureKeyvaultExplorer
                 var sub = arm.GetSubscriptionResource(new ResourceIdentifier($"/subscriptions/{subItem.ResourceId.Name}"));
                 var kvCollection = sub.GetKeyVaultsAsync();
 
+                toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+                toolStripStatusLabel1.Text = "Loading vaults...";
+
                 await foreach (var kv in kvCollection)
                 {
                     VaultItem item = new VaultItem
@@ -128,6 +131,10 @@ namespace AzureKeyvaultExplorer
                     }
                     vaultItems.Add(item);
                 }
+
+                toolStripProgressBar1.Style = ProgressBarStyle.Blocks;
+                toolStripProgressBar1.Value = 100;
+                toolStripStatusLabel1.Text = $"Loaded {lbVaults.Items.Count} vaults.";
             }
             catch (Exception ex)
             {
@@ -232,6 +239,8 @@ namespace AzureKeyvaultExplorer
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
+            lbSecrets.Items.Clear();
+            txtValue.Clear();
             lbVaults.Items.Clear();
             foreach (string str in vaultItems.Select(v => v.Name).Where(n => n.Contains(textBox1.Text, StringComparison.OrdinalIgnoreCase)))
             {
@@ -262,6 +271,11 @@ namespace AzureKeyvaultExplorer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
