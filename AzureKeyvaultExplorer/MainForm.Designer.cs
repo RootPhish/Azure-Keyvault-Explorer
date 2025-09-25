@@ -292,7 +292,6 @@
             Name = "MainForm";
             Text = "Azure Keyvault Explorer";
             Load += MainForm_Load;
-            KeyDown += MainForm_KeyDown;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
