@@ -30,116 +30,32 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            btnLoadSubs = new Button();
-            lbVaults = new ListBox();
-            lbSecrets = new ListBox();
-            txtValue = new TextBox();
-            lbSubs = new ListBox();
-            label1 = new Label();
-            label2 = new Label();
-            label3 = new Label();
-            label4 = new Label();
-            btnEye = new Button();
             imageList1 = new ImageList(components);
-            btnCopy = new Button();
             imageList2 = new ImageList(components);
+            menuStrip1 = new MenuStrip();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
+            loadSubscriptionsToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            preferencesToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            exitToolStripMenuItem = new ToolStripMenuItem();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            lblValue = new Label();
+            lblSecrets = new Label();
+            lblKeyvaults = new Label();
             textBox1 = new TextBox();
+            lbVaults = new ListBox();
+            lbSubs = new ListBox();
+            lbSecrets = new ListBox();
+            panel2 = new Panel();
+            btnCopy = new Button();
+            btnEye = new Button();
+            txtValue = new TextBox();
+            lblSubscriptions = new Label();
+            menuStrip1.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
-            // 
-            // btnLoadSubs
-            // 
-            btnLoadSubs.Location = new Point(12, 344);
-            btnLoadSubs.Name = "btnLoadSubs";
-            btnLoadSubs.Size = new Size(121, 23);
-            btnLoadSubs.TabIndex = 3;
-            btnLoadSubs.Text = "Load Subscriptions";
-            btnLoadSubs.UseVisualStyleBackColor = true;
-            // 
-            // lbVaults
-            // 
-            lbVaults.FormattingEnabled = true;
-            lbVaults.ItemHeight = 15;
-            lbVaults.Location = new Point(208, 93);
-            lbVaults.Name = "lbVaults";
-            lbVaults.Size = new Size(190, 244);
-            lbVaults.TabIndex = 4;
-            // 
-            // lbSecrets
-            // 
-            lbSecrets.FormattingEnabled = true;
-            lbSecrets.ItemHeight = 15;
-            lbSecrets.Location = new Point(404, 93);
-            lbSecrets.Name = "lbSecrets";
-            lbSecrets.Size = new Size(190, 244);
-            lbSecrets.TabIndex = 5;
-            // 
-            // txtValue
-            // 
-            txtValue.Location = new Point(600, 93);
-            txtValue.Name = "txtValue";
-            txtValue.Size = new Size(219, 23);
-            txtValue.TabIndex = 8;
-            txtValue.UseSystemPasswordChar = true;
-            txtValue.ReadOnly = true;
-            // 
-            // lbSubs
-            // 
-            lbSubs.FormattingEnabled = true;
-            lbSubs.ItemHeight = 15;
-            lbSubs.Location = new Point(12, 94);
-            lbSubs.Name = "lbSubs";
-            lbSubs.Size = new Size(190, 244);
-            lbSubs.TabIndex = 10;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 76);
-            label1.Name = "label1";
-            label1.Size = new Size(78, 15);
-            label1.TabIndex = 11;
-            label1.Text = "Subscriptions";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(208, 50);
-            label2.Name = "label2";
-            label2.Size = new Size(60, 15);
-            label2.TabIndex = 12;
-            label2.Text = "Key Vaults";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(404, 75);
-            label3.Name = "label3";
-            label3.Size = new Size(44, 15);
-            label3.TabIndex = 13;
-            label3.Text = "Secrets";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(600, 75);
-            label4.Name = "label4";
-            label4.Size = new Size(35, 15);
-            label4.TabIndex = 14;
-            label4.Text = "Value";
-            // 
-            // btnEye
-            // 
-            btnEye.BackgroundImageLayout = ImageLayout.Zoom;
-            btnEye.FlatAppearance.BorderSize = 0;
-            btnEye.FlatStyle = FlatStyle.Flat;
-            btnEye.ImageIndex = 1;
-            btnEye.ImageList = imageList1;
-            btnEye.Location = new Point(820, 93);
-            btnEye.Name = "btnEye";
-            btnEye.Size = new Size(20, 20);
-            btnEye.TabIndex = 15;
-            btnEye.TabStop = false;
-            btnEye.UseVisualStyleBackColor = true;
             // 
             // imageList1
             // 
@@ -149,20 +65,6 @@
             imageList1.Images.SetKeyName(0, "Ic_visibility_48px.svg.png");
             imageList1.Images.SetKeyName(1, "Ic_visibility_off_48px.svg.png");
             // 
-            // btnCopy
-            // 
-            btnCopy.BackgroundImageLayout = ImageLayout.Zoom;
-            btnCopy.FlatAppearance.BorderSize = 0;
-            btnCopy.FlatStyle = FlatStyle.Flat;
-            btnCopy.ImageIndex = 0;
-            btnCopy.ImageList = imageList2;
-            btnCopy.Location = new Point(845, 93);
-            btnCopy.Name = "btnCopy";
-            btnCopy.Size = new Size(20, 20);
-            btnCopy.TabIndex = 16;
-            btnCopy.TabStop = false;
-            btnCopy.UseVisualStyleBackColor = true;
-            // 
             // imageList2
             // 
             imageList2.ColorDepth = ColorDepth.Depth32Bit;
@@ -171,52 +73,258 @@
             imageList2.Images.SetKeyName(0, "Ic_content_copy_48px.svg.png");
             imageList2.Images.SetKeyName(1, "Ic_done_48px.svg.png");
             // 
+            // menuStrip1
+            // 
+            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(961, 24);
+            menuStrip1.TabIndex = 18;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadSubscriptionsToolStripMenuItem, toolStripSeparator1, preferencesToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(37, 20);
+            settingsToolStripMenuItem.Text = "File";
+            // 
+            // loadSubscriptionsToolStripMenuItem
+            // 
+            loadSubscriptionsToolStripMenuItem.Name = "loadSubscriptionsToolStripMenuItem";
+            loadSubscriptionsToolStripMenuItem.Size = new Size(180, 22);
+            loadSubscriptionsToolStripMenuItem.Text = "Load Subscriptions";
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(177, 6);
+            // 
+            // preferencesToolStripMenuItem
+            // 
+            preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
+            preferencesToolStripMenuItem.Size = new Size(180, 22);
+            preferencesToolStripMenuItem.Text = "Preferences...";
+            preferencesToolStripMenuItem.Click += preferencesToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(177, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 4;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33333F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333359F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333359F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300F));
+            tableLayoutPanel1.Controls.Add(lblValue, 3, 0);
+            tableLayoutPanel1.Controls.Add(lblSecrets, 2, 0);
+            tableLayoutPanel1.Controls.Add(lblKeyvaults, 1, 0);
+            tableLayoutPanel1.Controls.Add(textBox1, 1, 1);
+            tableLayoutPanel1.Controls.Add(lbVaults, 1, 2);
+            tableLayoutPanel1.Controls.Add(lbSubs, 0, 1);
+            tableLayoutPanel1.Controls.Add(lbSecrets, 2, 1);
+            tableLayoutPanel1.Controls.Add(panel2, 3, 1);
+            tableLayoutPanel1.Controls.Add(lblSubscriptions, 0, 0);
+            tableLayoutPanel1.Dock = DockStyle.Fill;
+            tableLayoutPanel1.Location = new Point(0, 24);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 3;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.Size = new Size(961, 426);
+            tableLayoutPanel1.TabIndex = 19;
+            // 
+            // lblValue
+            // 
+            lblValue.AutoSize = true;
+            lblValue.Dock = DockStyle.Fill;
+            lblValue.Location = new Point(663, 0);
+            lblValue.Name = "lblValue";
+            lblValue.Size = new Size(295, 30);
+            lblValue.TabIndex = 30;
+            lblValue.Text = "Value";
+            lblValue.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblSecrets
+            // 
+            lblSecrets.AutoSize = true;
+            lblSecrets.Dock = DockStyle.Fill;
+            lblSecrets.Location = new Point(443, 0);
+            lblSecrets.Name = "lblSecrets";
+            lblSecrets.Size = new Size(214, 30);
+            lblSecrets.TabIndex = 29;
+            lblSecrets.Text = "Secrets";
+            lblSecrets.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblKeyvaults
+            // 
+            lblKeyvaults.AutoSize = true;
+            lblKeyvaults.Dock = DockStyle.Fill;
+            lblKeyvaults.Location = new Point(223, 0);
+            lblKeyvaults.Name = "lblKeyvaults";
+            lblKeyvaults.Size = new Size(214, 30);
+            lblKeyvaults.TabIndex = 28;
+            lblKeyvaults.Text = "Key Vaults";
+            lblKeyvaults.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // textBox1
             // 
-            textBox1.Location = new Point(208, 68);
+            textBox1.Dock = DockStyle.Top;
+            textBox1.Location = new Point(223, 33);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(190, 23);
-            textBox1.TabIndex = 17;
+            textBox1.Size = new Size(214, 23);
+            textBox1.TabIndex = 26;
             textBox1.TextChanged += textBox1_TextChanged;
+            // 
+            // lbVaults
+            // 
+            lbVaults.Dock = DockStyle.Fill;
+            lbVaults.FormattingEnabled = true;
+            lbVaults.ItemHeight = 15;
+            lbVaults.Location = new Point(223, 63);
+            lbVaults.Name = "lbVaults";
+            lbVaults.Size = new Size(214, 360);
+            lbVaults.TabIndex = 25;
+            // 
+            // lbSubs
+            // 
+            lbSubs.Dock = DockStyle.Fill;
+            lbSubs.FormattingEnabled = true;
+            lbSubs.ItemHeight = 15;
+            lbSubs.Location = new Point(3, 33);
+            lbSubs.Name = "lbSubs";
+            tableLayoutPanel1.SetRowSpan(lbSubs, 2);
+            lbSubs.Size = new Size(214, 390);
+            lbSubs.TabIndex = 24;
+            // 
+            // lbSecrets
+            // 
+            lbSecrets.Dock = DockStyle.Fill;
+            lbSecrets.FormattingEnabled = true;
+            lbSecrets.ItemHeight = 15;
+            lbSecrets.Location = new Point(443, 33);
+            lbSecrets.Name = "lbSecrets";
+            tableLayoutPanel1.SetRowSpan(lbSecrets, 2);
+            lbSecrets.Size = new Size(214, 390);
+            lbSecrets.TabIndex = 13;
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(btnCopy);
+            panel2.Controls.Add(btnEye);
+            panel2.Controls.Add(txtValue);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(663, 33);
+            panel2.Name = "panel2";
+            tableLayoutPanel1.SetRowSpan(panel2, 2);
+            panel2.Size = new Size(295, 390);
+            panel2.TabIndex = 23;
+            // 
+            // btnCopy
+            // 
+            btnCopy.BackgroundImageLayout = ImageLayout.Zoom;
+            btnCopy.FlatAppearance.BorderSize = 0;
+            btnCopy.FlatStyle = FlatStyle.Flat;
+            btnCopy.ImageIndex = 0;
+            btnCopy.ImageList = imageList2;
+            btnCopy.Location = new Point(253, 26);
+            btnCopy.Name = "btnCopy";
+            btnCopy.Size = new Size(20, 20);
+            btnCopy.TabIndex = 23;
+            btnCopy.TabStop = false;
+            btnCopy.UseVisualStyleBackColor = true;
+            // 
+            // btnEye
+            // 
+            btnEye.BackgroundImageLayout = ImageLayout.Zoom;
+            btnEye.FlatAppearance.BorderSize = 0;
+            btnEye.FlatStyle = FlatStyle.Flat;
+            btnEye.ImageIndex = 1;
+            btnEye.ImageList = imageList1;
+            btnEye.Location = new Point(228, 26);
+            btnEye.Name = "btnEye";
+            btnEye.Size = new Size(20, 20);
+            btnEye.TabIndex = 22;
+            btnEye.TabStop = false;
+            btnEye.UseVisualStyleBackColor = true;
+            // 
+            // txtValue
+            // 
+            txtValue.Location = new Point(26, 23);
+            txtValue.Name = "txtValue";
+            txtValue.ReadOnly = true;
+            txtValue.Size = new Size(196, 23);
+            txtValue.TabIndex = 21;
+            txtValue.UseSystemPasswordChar = true;
+            // 
+            // lblSubscriptions
+            // 
+            lblSubscriptions.AutoSize = true;
+            lblSubscriptions.Dock = DockStyle.Fill;
+            lblSubscriptions.Location = new Point(3, 0);
+            lblSubscriptions.Name = "lblSubscriptions";
+            lblSubscriptions.Size = new Size(214, 30);
+            lblSubscriptions.TabIndex = 27;
+            lblSubscriptions.Text = "Subscriptions";
+            lblSubscriptions.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(961, 450);
-            Controls.Add(textBox1);
-            Controls.Add(btnCopy);
-            Controls.Add(btnEye);
-            Controls.Add(label4);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(label1);
-            Controls.Add(lbSubs);
-            Controls.Add(txtValue);
-            Controls.Add(lbSecrets);
-            Controls.Add(lbVaults);
-            Controls.Add(btnLoadSubs);
+            Controls.Add(tableLayoutPanel1);
+            Controls.Add(menuStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = menuStrip1;
             Name = "MainForm";
             Text = "Azure Keyvault Explorer";
+            Load += MainForm_Load;
             KeyDown += MainForm_KeyDown;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private Button btnLoadSubs;
-        private ListBox lbVaults;
-        private ListBox lbSecrets;
-        private TextBox txtValue;
-        private ListBox lbSubs;
-        private Label label1;
-        private Label label2;
-        private Label label3;
-        private Label label4;
-        private Button btnEye;
-        private Button btnCopy;
         private ImageList imageList1;
         private ImageList imageList2;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem preferencesToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem;
+        private ToolStripMenuItem loadSubscriptionsToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator toolStripSeparator2;
+        private TableLayoutPanel tableLayoutPanel1;
+        private ListBox lbSecrets;
+        private Panel panel2;
+        private Button btnCopy;
+        private Button btnEye;
+        private TextBox txtValue;
         private TextBox textBox1;
+        private ListBox lbVaults;
+        private ListBox lbSubs;
+        private Label lblValue;
+        private Label lblSecrets;
+        private Label lblKeyvaults;
+        private Label lblSubscriptions;
     }
 }

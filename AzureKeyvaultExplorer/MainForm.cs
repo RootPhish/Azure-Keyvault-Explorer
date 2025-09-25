@@ -15,6 +15,8 @@ namespace AzureKeyvaultExplorer
 
         private bool _revealed;
 
+        private UserSettings settings;
+
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
 
@@ -26,7 +28,7 @@ namespace AzureKeyvaultExplorer
 
             btnEye.Click += (_, __) => ToggleReveal();
             btnCopy.Click += async (_, __) => await CopyPasswordAsync();
-            btnLoadSubs.Click += async (_, __) => await LoadSubsAsync();
+            loadSubscriptionsToolStripMenuItem.Click += async (_, __) => await LoadSubsAsync();
             lbSubs.SelectedIndexChanged += async (_, __) => await LoadVaultsAsync();
             lbVaults.SelectedIndexChanged += async (_, __) => await LoadSecretsAsync();
             lbSecrets.SelectedIndexChanged += async (_, __) => await GetSecretValueAsync();
@@ -59,8 +61,12 @@ namespace AzureKeyvaultExplorer
 
         private async Task LoadSubsAsync()
         {
-            _credential = new MsalTokenCredential(System.Configuration.ConfigurationManager.AppSettings["ClientID"] ?? "",
-                                                  System.Configuration.ConfigurationManager.AppSettings["TenantID"] ?? "");
+            if (string.IsNullOrEmpty(settings.TenantID) || string.IsNullOrEmpty(settings.ClientID))
+            {
+                MessageBox.Show("No TenantID and/or ClientID defined. Please set in the Preferences");
+                return;
+            }
+            _credential = new MsalTokenCredential(settings.ClientID, settings.TenantID);
 
             try
             {
@@ -249,6 +255,33 @@ namespace AzureKeyvaultExplorer
             {
                 _ = CopyPasswordAsync();
             }
+        }
+
+        private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var settingsForm = new SettingsForm();
+            settingsForm.ShowDialog();
+            settings = UserSettings.Load();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            settings = UserSettings.Load();
+        }
+
+        private void loadSubscriptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
