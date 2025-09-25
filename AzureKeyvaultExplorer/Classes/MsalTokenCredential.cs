@@ -1,7 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.Identity.Client;
 
-namespace AzureKeyvaultExplorer
+namespace AzureKeyvaultExplorer.Classes
 {
     public class MsalTokenCredential : TokenCredential
     {

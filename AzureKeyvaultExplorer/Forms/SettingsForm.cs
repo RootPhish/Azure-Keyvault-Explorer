@@ -1,4 +1,6 @@
-﻿namespace AzureKeyvaultExplorer
+﻿using AzureKeyvaultExplorer.Classes;
+
+namespace AzureKeyvaultExplorer
 {
     public partial class SettingsForm : Form
     {
@@ -16,6 +18,11 @@
         private void SettingsForm_Load(object sender, EventArgs e)
         {
             pgSettings.SelectedObject = new SettingsWrapper();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //this.Close();
         }
     }
 }

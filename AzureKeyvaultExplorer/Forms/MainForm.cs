@@ -3,6 +3,7 @@ using Azure.Core;
 using Azure.ResourceManager;
 using Azure.ResourceManager.KeyVault;
 using Azure.Security.KeyVault.Secrets;
+using AzureKeyvaultExplorer.Classes;
 using System.Runtime.InteropServices;
 
 namespace AzureKeyvaultExplorer
@@ -30,13 +31,22 @@ namespace AzureKeyvaultExplorer
             lbSubs.SelectedIndexChanged += async (_, __) => await LoadVaultsAsync();
             lbVaults.SelectedIndexChanged += async (_, __) => await LoadSecretsAsync();
             lbSecrets.SelectedIndexChanged += async (_, __) => await GetSecretValueAsync();
+
+            btnEye.ImageList = new();
+            btnEye.ImageList.Images.Add(Properties.Resources.eye_open);
+            btnEye.ImageList.Images.Add(Properties.Resources.eye_closed);
+
+            btnCopy.ImageList = new();
+            btnCopy.ImageList.Images.Add(Properties.Resources.copy);
+            btnCopy.ImageList.Images.Add(Properties.Resources.check);
+
         }
 
-        //protected override void OnHandleCreated(EventArgs e)
-        //{
-        //    base.OnHandleCreated(e);
-        //    SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
-        //}
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
+        }
 
         private TokenCredential? _credential;
 
@@ -71,6 +81,7 @@ namespace AzureKeyvaultExplorer
                 lbSubs.Items.Clear();
                 lbVaults.Items.Clear();
                 lbSecrets.Items.Clear();
+                btnCopy.Enabled = false;
                 txtValue.Clear();
 
                 var arm = new ArmClient(_credential);
@@ -95,7 +106,7 @@ namespace AzureKeyvaultExplorer
             }
         }
 
-        List<VaultItem> vaultItems = new List<VaultItem>();
+        List<VaultItem> vaultItems = new List<VaultItem>(); // save the loaded vaults for filtering
 
         private async Task LoadVaultsAsync()
         {
@@ -104,7 +115,9 @@ namespace AzureKeyvaultExplorer
                 lbSubs.Enabled = false;
                 lbVaults.Items.Clear();
                 lbSecrets.Items.Clear();
+                btnCopy.Enabled = false;
                 txtValue.Clear();
+
                 if (lbSubs.SelectedItem is not SubItem subItem)
                 {
                     MessageBox.Show("Please select a Subscription first.", "Info");
@@ -114,8 +127,8 @@ namespace AzureKeyvaultExplorer
                 var sub = arm.GetSubscriptionResource(new ResourceIdentifier($"/subscriptions/{subItem.ResourceId.Name}"));
                 var kvCollection = sub.GetKeyVaultsAsync();
 
-                toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
-                toolStripStatusLabel1.Text = "Loading vaults...";
+                progressBar.Style = ProgressBarStyle.Marquee;
+                statusLabel.Text = "Loading vaults...";
 
                 await foreach (var kv in kvCollection)
                 {
@@ -125,19 +138,22 @@ namespace AzureKeyvaultExplorer
                         ResourceId = kv.Id,
                         VaultUri = kv.Data.Properties.VaultUri.ToString()
                     };
-                    if (kv.Data.Name.Contains(textBox1.Text, StringComparison.OrdinalIgnoreCase))
+                    if (kv.Data.Name.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
                     {
                         lbVaults.Items.Add(item);
                     }
                     vaultItems.Add(item);
                 }
 
-                toolStripProgressBar1.Style = ProgressBarStyle.Blocks;
-                toolStripProgressBar1.Value = 100;
-                toolStripStatusLabel1.Text = $"Loaded {lbVaults.Items.Count} vaults.";
+                progressBar.Style = ProgressBarStyle.Blocks;
+                progressBar.Value = 100;
+                statusLabel.Text = $"Loaded {lbVaults.Items.Count} vaults.";
             }
-            catch (Exception ex)
+            catch
             {
+                progressBar.Style = ProgressBarStyle.Blocks;
+                progressBar.Value = 0;
+                statusLabel.Text = "";
                 MessageBox.Show($"Failed to load vaults for selected subscription.\nDo you have the correct authorizations?", "Error");
             }
             finally
@@ -152,7 +168,9 @@ namespace AzureKeyvaultExplorer
             {
                 lbVaults.Enabled = false;
                 lbSecrets.Items.Clear();
+                btnCopy.Enabled = false;
                 txtValue.Clear();
+
                 if (lbVaults.SelectedItem is not VaultItem vault)
                 {
                     MessageBox.Show("Please select a Vault first.", "Info");
@@ -183,7 +201,10 @@ namespace AzureKeyvaultExplorer
             try
             {
                 lbSecrets.Enabled = false;
+                btnCopy.Enabled = false;
+                btnCopy.Enabled = false;
                 txtValue.Clear();
+                
                 if (lbVaults.SelectedItem is not VaultItem vault)
                 {
                     MessageBox.Show("Please select a Vault first.", "Info");
@@ -198,6 +219,7 @@ namespace AzureKeyvaultExplorer
                 var secretClient = new SecretClient(new Uri(vault.VaultUri), _credential);
                 KeyVaultSecret secret = await secretClient.GetSecretAsync(secretName);
                 txtValue.Text = secret.Value;
+                btnCopy.Enabled = true;
             }
             catch (RequestFailedException rfe)
             {
@@ -217,16 +239,15 @@ namespace AzureKeyvaultExplorer
         {
             try
             {
-                Clipboard.SetText(txtValue.Text ?? string.Empty);
+                Clipboard.SetText(txtValue.Text ?? "");
 
-                btnCopy.Enabled = false;
                 btnCopy.ImageIndex = 1;
                 await Task.Delay(900);
                 btnCopy.ImageIndex = 0;
             }
-            finally
+            catch (Exception ex)
             {
-                btnCopy.Enabled = true;
+                MessageBox.Show($"Failed to copy to clipboard:\n{ex.Message}", "Error");
             }
         }
 
@@ -240,9 +261,10 @@ namespace AzureKeyvaultExplorer
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             lbSecrets.Items.Clear();
+            btnCopy.Enabled = false;
             txtValue.Clear();
             lbVaults.Items.Clear();
-            foreach (string str in vaultItems.Select(v => v.Name).Where(n => n.Contains(textBox1.Text, StringComparison.OrdinalIgnoreCase)))
+            foreach (string str in vaultItems.Select(v => v.Name).Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
             {
                 lbVaults.Items.Add(vaultItems.First(v => v.Name == str));
             }
