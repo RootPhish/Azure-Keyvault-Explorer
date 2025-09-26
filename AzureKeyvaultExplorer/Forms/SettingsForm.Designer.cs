@@ -67,7 +67,6 @@
             // btnOK
             // 
             btnOK.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnOK.DialogResult = DialogResult.OK;
             btnOK.FlatStyle = FlatStyle.Flat;
             btnOK.Location = new Point(179, 352);
             btnOK.Margin = new Padding(3, 6, 3, 3);
@@ -76,6 +75,7 @@
             btnOK.TabIndex = 7;
             btnOK.Text = "OK";
             btnOK.UseVisualStyleBackColor = true;
+            btnOK.Click += btnOK_Click;
             // 
             // pgSettings
             // 
