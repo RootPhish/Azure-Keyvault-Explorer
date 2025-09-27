@@ -148,7 +148,7 @@
             txtFilter.Name = "txtFilter";
             txtFilter.Size = new Size(225, 23);
             txtFilter.TabIndex = 33;
-            txtFilter.TextChanged += textBox1_TextChanged;
+            //txtFilter.TextChanged += textBox1_TextChanged;
             // 
             // lblValue
             // 
