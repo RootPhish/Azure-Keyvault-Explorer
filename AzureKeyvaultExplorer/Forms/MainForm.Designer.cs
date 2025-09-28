@@ -97,7 +97,6 @@
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
             connectToolStripMenuItem.Size = new Size(64, 20);
             connectToolStripMenuItem.Text = "Connect";
-            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
             // mainTableLayoutPanel
             // 
@@ -148,7 +147,7 @@
             txtFilter.Name = "txtFilter";
             txtFilter.Size = new Size(225, 23);
             txtFilter.TabIndex = 33;
-            txtFilter.TextChanged += textBox1_TextChanged;
+            txtFilter.TextChanged += txtFilter_TextChanged;
             // 
             // lblValue
             // 
@@ -301,7 +300,6 @@
             MainMenuStrip = mainMenu;
             Name = "MainForm";
             Text = "Azure Keyvault Explorer";
-            Load += MainForm_Load;
             mainMenu.ResumeLayout(false);
             mainMenu.PerformLayout();
             mainTableLayoutPanel.ResumeLayout(false);
