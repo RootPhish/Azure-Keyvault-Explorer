@@ -13,6 +13,7 @@ namespace AzureKeyvaultExplorer
 
         private bool _revealed;
         private MsalTokenCredential _credential;
+        private List<KeyvaultItem> _allVaults = new();
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
@@ -20,6 +21,8 @@ namespace AzureKeyvaultExplorer
         public MainForm()
         {
             InitializeComponent();
+
+            lbVaults.DisplayMember = "Name";
 
             txtValue.UseSystemPasswordChar = true;
 
@@ -63,6 +66,7 @@ namespace AzureKeyvaultExplorer
             {
                 lbSubs.Items.Clear();
                 lbVaults.Items.Clear();
+                _allVaults.Clear();
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
@@ -91,6 +95,7 @@ namespace AzureKeyvaultExplorer
             {
                 lbSubs.Enabled = false;
                 lbVaults.Items.Clear();
+                _allVaults.Clear();
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
@@ -106,12 +111,17 @@ namespace AzureKeyvaultExplorer
 
                 var service = new AzureKeyvaultService(_credential);
 
-                await foreach (var kv in service.GetKeyvaultsAsync(subItem)) {
-                    lbVaults.Items.Add(kv);
+                await foreach (var kv in service.GetKeyvaultsAsync(subItem))
+                {
+                    _allVaults.Add(kv);
+                    if (kv.Name.Contains(txtFilter.Text))
+                    {
+                        lbVaults.Items.Add(kv);
+                    }
                 }
                 progressBar.Style = ProgressBarStyle.Blocks;
                 progressBar.Value = 100;
-                statusLabel.Text = $"Loaded {lbVaults.Items.Count} vaults.";
+                statusLabel.Text = $"Loaded {_allVaults.Count} vaults.";
             }
             catch
             {
@@ -140,7 +150,7 @@ namespace AzureKeyvaultExplorer
                     MessageBox.Show("Please select a Vault first.", "Info");
                     return;
                 }
-        
+
                 var service = new AzureSecretService(_credential);
 
                 await foreach (var secret in service.GetSecretsAsync(vault))
@@ -225,17 +235,17 @@ namespace AzureKeyvaultExplorer
             btnEye.ImageIndex = (btnEye.ImageIndex + 1) % 2;
         }
 
-        //private void textBox1_TextChanged(object sender, EventArgs e)
-        //{
-        //    lbSecrets.Items.Clear();
-        //    btnCopy.Enabled = false;
-        //    txtValue.Clear();
-        //    lbVaults.Items.Clear();
-        //    foreach (string str in vaultItems.Select(v => v.Name).Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
-        //    {
-        //        lbVaults.Items.Add(vaultItems.First(v => v.Name == str));
-        //    }
-        //}
+        private void txtFilter_TextChanged(object sender, EventArgs e)
+        {
+            lbSecrets.Items.Clear();
+            btnCopy.Enabled = false;
+            txtValue.Clear();
+            lbVaults.Items.Clear();
+            foreach (string str in _allVaults.Select(v => v.Name).Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
+            {
+                lbVaults.Items.Add(_allVaults.First(v => v.Name == str));
+            }
+        }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -253,18 +263,9 @@ namespace AzureKeyvaultExplorer
             settingsForm.ShowDialog();
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
