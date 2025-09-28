@@ -89,8 +89,12 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private int _lastSubIndex = -2;
         private async Task LoadVaultsAsync()
         {
+            if ((lbSubs.SelectedIndex == -1) || (lbSubs.SelectedIndex == _lastSubIndex))
+                return;
+            _lastSubIndex = lbSubs.SelectedIndex;
             try
             {
                 lbSubs.Enabled = false;
@@ -100,11 +104,9 @@ namespace AzureKeyvaultExplorer
                 btnCopy.Enabled = false;
                 txtValue.Clear();
 
-                if (lbSubs.SelectedItem is not SubscriptionItem subItem)
-                {
-                    MessageBox.Show("Please select a Subscription first.", "Info");
+                SubscriptionItem? subItem = lbSubs.SelectedItem as SubscriptionItem;
+                if (subItem == null)
                     return;
-                }
 
                 progressBar.Style = ProgressBarStyle.Marquee;
                 statusLabel.Text = "Loading vaults...";
@@ -114,7 +116,7 @@ namespace AzureKeyvaultExplorer
                 await foreach (var kv in service.GetKeyvaultsAsync(subItem))
                 {
                     _allVaults.Add(kv);
-                    if (kv.Name.Contains(txtFilter.Text))
+                    if (kv.Name.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
                     {
                         lbVaults.Items.Add(kv);
                     }
@@ -136,20 +138,24 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private int _lastVaultIndex = -2;
         private async Task LoadSecretsAsync()
         {
+            if ((lbVaults.SelectedIndex == -1) || (lbVaults.SelectedIndex == _lastVaultIndex))
+                return;
+            _lastVaultIndex = lbVaults.SelectedIndex;
             try
             {
+                KeyvaultItem? vault = lbVaults.SelectedItem as KeyvaultItem;
+
+                if (vault == null)
+                    return;
+
                 lbVaults.Enabled = false;
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
+                _lastSecretIndex = -2;
                 txtValue.Clear();
-
-                if (lbVaults.SelectedItem is not KeyvaultItem vault)
-                {
-                    MessageBox.Show("Please select a Vault first.", "Info");
-                    return;
-                }
 
                 var service = new AzureSecretService(_credential);
 
@@ -173,8 +179,12 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private int _lastSecretIndex = -2;
         private void GetSecretValue()
         {
+            if ((lbSecrets.SelectedIndex == -1) || (lbSecrets.SelectedIndex == _lastSecretIndex))
+                return;
+            _lastSecretIndex = lbSecrets.SelectedIndex;
             try
             {
                 lbSecrets.Enabled = false;
@@ -182,16 +192,12 @@ namespace AzureKeyvaultExplorer
                 btnCopy.Enabled = false;
                 txtValue.Clear();
 
-                if (lbVaults.SelectedItem is not KeyvaultItem vault)
-                {
-                    MessageBox.Show("Please select a Vault first.", "Info");
+                KeyvaultItem? vault = lbVaults.SelectedItem as KeyvaultItem;
+                string? secretName = lbSecrets.SelectedItem as string;
+
+                if ((vault == null) || (secretName == null))
                     return;
-                }
-                if (lbSecrets.SelectedItem is not string secretName || string.IsNullOrWhiteSpace(secretName))
-                {
-                    MessageBox.Show("Please select a secret.", "Info");
-                    return;
-                }
+                
                 var service = new AzureSecretService(_credential);
 
                 txtValue.Text = service.GetSecretValue(vault, secretName);
