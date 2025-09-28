@@ -1,7 +1,7 @@
-using AzureKeyvaultExplorer.Services;
-using AzureKeyvaultExplorer.Classes;
-using System.Runtime.InteropServices;
 using Azure;
+using AzureKeyvaultExplorer.Classes;
+using AzureKeyvaultExplorer.Services;
+using System.Runtime.InteropServices;
 
 namespace AzureKeyvaultExplorer
 {
