@@ -1,4 +1,5 @@
-﻿using Azure.ResourceManager;
+﻿using Azure.Core;
+using Azure.ResourceManager;
 using Azure.Security.KeyVault.Secrets;
 using AzureKeyvaultExplorer.Classes;
 
@@ -6,9 +7,9 @@ namespace AzureKeyvaultExplorer.Services
 {
     internal class AzureSecretService
     {
-        private MsalTokenCredential _credential;
+        private TokenCredential _credential;
 
-        public AzureSecretService(MsalTokenCredential credential)
+        public AzureSecretService(TokenCredential credential)
         {
             _credential = credential;
         }
