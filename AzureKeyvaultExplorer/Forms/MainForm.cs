@@ -12,7 +12,7 @@ namespace AzureKeyvaultExplorer
         public const uint WDA_EXCLUDEFROMCAPTURE = 17;
 
         private bool _revealed;
-        private MsalTokenCredential _credential;
+        private MsalTokenCredential? _credential;
         private List<KeyvaultItem> _allVaults = new();
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -41,10 +41,17 @@ namespace AzureKeyvaultExplorer
             btnCopy.ImageList.Images.Add(Properties.Resources.copy);
             btnCopy.ImageList.Images.Add(Properties.Resources.check);
 
-            _credential = new MsalTokenCredential(
-                Properties.Settings.Default.ClientID,
-                Properties.Settings.Default.TenantID);
+            try
+            {
+                _credential = new MsalTokenCredential(
+                    Properties.Settings.Default.ClientID,
+                    Properties.Settings.Default.TenantID);
+            }
 
+            catch
+            {
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            }
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -55,10 +62,9 @@ namespace AzureKeyvaultExplorer
 
         private async Task LoadSubsAsync()
         {
-            if (string.IsNullOrEmpty(Properties.Settings.Default.TenantID) ||
-                string.IsNullOrEmpty(Properties.Settings.Default.ClientID))
+            if (_credential == null)
             {
-                MessageBox.Show("No TenantID and/or ClientID defined. Please set in the Preferences");
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
                 return;
             }
 
@@ -70,6 +76,7 @@ namespace AzureKeyvaultExplorer
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
+
 
                 var service = new AzureSubscriptionService(_credential);
 
@@ -92,6 +99,12 @@ namespace AzureKeyvaultExplorer
         private int _lastSubIndex = -2;
         private async Task LoadVaultsAsync()
         {
+            if (_credential == null)
+            {
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+                return;
+            }
+
             if ((lbSubs.SelectedIndex == -1) || (lbSubs.SelectedIndex == _lastSubIndex))
                 return;
             _lastSubIndex = lbSubs.SelectedIndex;
@@ -141,6 +154,12 @@ namespace AzureKeyvaultExplorer
         private int _lastVaultIndex = -2;
         private async Task LoadSecretsAsync()
         {
+            if (_credential == null)
+            {
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+                return;
+            }
+
             if ((lbVaults.SelectedIndex == -1) || (lbVaults.SelectedIndex == _lastVaultIndex))
                 return;
             _lastVaultIndex = lbVaults.SelectedIndex;
@@ -182,6 +201,12 @@ namespace AzureKeyvaultExplorer
         private int _lastSecretIndex = -2;
         private void GetSecretValue()
         {
+            if (_credential == null)
+            {
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+                return;
+            }
+
             if ((lbSecrets.SelectedIndex == -1) || (lbSecrets.SelectedIndex == _lastSecretIndex))
                 return;
             _lastSecretIndex = lbSecrets.SelectedIndex;
@@ -266,7 +291,22 @@ namespace AzureKeyvaultExplorer
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var settingsForm = new SettingsForm();
-            settingsForm.ShowDialog();
+            var dialogResult = settingsForm.ShowDialog();
+            if (dialogResult != DialogResult.OK)
+            {
+                return;
+            }
+            try
+            {
+                _credential = new MsalTokenCredential(
+                    Properties.Settings.Default.ClientID,
+                    Properties.Settings.Default.TenantID);
+            }
+
+            catch
+            {
+                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
