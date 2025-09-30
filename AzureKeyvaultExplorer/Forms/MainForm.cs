@@ -41,17 +41,6 @@ namespace AzureKeyvaultExplorer
             btnCopy.ImageList.Images.Add(Properties.Resources.copy);
             btnCopy.ImageList.Images.Add(Properties.Resources.check);
 
-            try
-            {
-                _credential = new MsalTokenCredential(
-                    Properties.Settings.Default.ClientID,
-                    Properties.Settings.Default.TenantID);
-            }
-
-            catch
-            {
-                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
-            }
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -249,6 +238,8 @@ namespace AzureKeyvaultExplorer
             {
                 Clipboard.SetText(txtValue.Text ?? "");
 
+                _ = ClearClipboardAfterDelayAsync(Properties.Settings.Default.ClearClipboard);
+
                 btnCopy.ImageIndex = 1;
                 await Task.Delay(900);
                 btnCopy.ImageIndex = 0;
@@ -257,6 +248,12 @@ namespace AzureKeyvaultExplorer
             {
                 MessageBox.Show($"Failed to copy to clipboard:\n{ex.Message}", "Error");
             }
+        }
+
+        private async Task ClearClipboardAfterDelayAsync(int seconds)
+        {
+            await Task.Delay(seconds * 1000);
+            Clipboard.Clear();
         }
 
         private void ToggleReveal()
@@ -325,6 +322,20 @@ namespace AzureKeyvaultExplorer
                 }
             }
             Console.WriteLine(e.KeyCode);
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.ClientID) ||
+                string.IsNullOrWhiteSpace(Properties.Settings.Default.TenantID) ||
+                Properties.Settings.Default.ClientID == "00000000-0000-0000-0000-000000000000" ||
+                Properties.Settings.Default.TenantID == "00000000-0000-0000-0000-000000000000")
+            {
+                MessageBox.Show("Missing or incorrect authentication configuration.\nPlease check your Preferences.", "Info");
+            }
+            _credential = new MsalTokenCredential(
+                Properties.Settings.Default.ClientID,
+                Properties.Settings.Default.TenantID);
         }
     }
 }

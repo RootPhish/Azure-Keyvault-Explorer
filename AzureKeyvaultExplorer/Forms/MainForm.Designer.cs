@@ -301,6 +301,7 @@
             MainMenuStrip = mainMenu;
             Name = "MainForm";
             Text = "Azure Keyvault Explorer";
+            Shown += MainForm_Shown;
             mainMenu.ResumeLayout(false);
             mainMenu.PerformLayout();
             mainTableLayoutPanel.ResumeLayout(false);
