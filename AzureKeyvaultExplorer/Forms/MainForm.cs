@@ -222,7 +222,7 @@ namespace AzureKeyvaultExplorer
 
                 if ((vault == null) || (secretName == null))
                     return;
-                
+
                 var service = new AzureSecretService(_credential);
 
                 txtValue.Text = service.GetSecretValue(vault, secretName);
@@ -272,6 +272,7 @@ namespace AzureKeyvaultExplorer
             btnCopy.Enabled = false;
             txtValue.Clear();
             lbVaults.Items.Clear();
+            _lastVaultIndex = -2;
             foreach (string str in _allVaults.Select(v => v.Name).Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
             {
                 lbVaults.Items.Add(_allVaults.First(v => v.Name == str));
@@ -312,6 +313,18 @@ namespace AzureKeyvaultExplorer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void txtFilter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                if (lbVaults.Items.Count > 0)
+                {
+                    lbVaults.SelectedIndex = 0;
+                }
+            }
+            Console.WriteLine(e.KeyCode);
         }
     }
 }
