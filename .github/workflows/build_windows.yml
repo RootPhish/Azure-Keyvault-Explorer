@@ -1,8 +1,10 @@
 name: Build application for Windows
 
 on:
-  workflow_dispatch:
-
+  push:
+    tags:
+      - 'v*.*.*'  
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -20,18 +22,23 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build 
+        --configuration Release
+        --no-restore
 
     - name: Publish
-      run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true --no-restore -o AzureKeyvaultExplorer\bin\Debug\net8.0-windows
+      run: dotnet publish
+        --configuration Release
+        --self-contained false
+        --no-restore
+        --no-build
+        --property:PublishSingleFile=true
 
-    - name: Create artifact
-      uses: actions/upload-artifact@v4
+    - name: List files
+      run: Get-ChildItem -Recurse AzureKeyvaultExplorer\bin
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: Azure-Keyvault-Explorer
-        path: AzureKeyvaultExplorer\bin\Debug\net8.0-windows
-
-    # - name: Show where we are
-    #   run: |
-    #       Get-Location
-    #       Get-ChildItem -Recurse
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: AzureKeyvaultExplorer/bin/Release/net8.0-windows/win-x64/publish/*.exe
