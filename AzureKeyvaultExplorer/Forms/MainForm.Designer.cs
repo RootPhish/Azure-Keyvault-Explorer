@@ -148,6 +148,7 @@
             txtFilter.Size = new Size(225, 23);
             txtFilter.TabIndex = 33;
             txtFilter.TextChanged += txtFilter_TextChanged;
+            txtFilter.KeyDown += txtFilter_KeyDown;
             // 
             // lblValue
             // 
