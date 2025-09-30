@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-    <Company>Wouter Sonneveldt</Company>
+    <Company></Company>
     <Product>Azure Keyvault Explorer</Product>
   </PropertyGroup>
 

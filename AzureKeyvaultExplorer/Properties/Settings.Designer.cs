@@ -25,7 +25,7 @@ namespace AzureKeyvaultExplorer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
         public string ClientID {
             get {
                 return ((string)(this["ClientID"]));
@@ -37,13 +37,25 @@ namespace AzureKeyvaultExplorer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
         public string TenantID {
             get {
                 return ((string)(this["TenantID"]));
             }
             set {
                 this["TenantID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int ClearClipboard {
+            get {
+                return ((int)(this["ClearClipboard"]));
+            }
+            set {
+                this["ClearClipboard"] = value;
             }
         }
     }
