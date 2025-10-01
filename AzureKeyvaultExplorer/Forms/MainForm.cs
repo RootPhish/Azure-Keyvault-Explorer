@@ -1,6 +1,5 @@
 using Azure;
-using AzureKeyvaultExplorer.Classes;
-using AzureKeyvaultExplorer.Services;
+using Library;
 using System.Runtime.InteropServices;
 
 namespace AzureKeyvaultExplorer
@@ -13,7 +12,7 @@ namespace AzureKeyvaultExplorer
 
         private bool _revealed;
         private MsalTokenCredential? _credential;
-        private List<KeyvaultItem> _allVaults = new();
+        private List<string> _allVaults = new();
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
@@ -118,7 +117,7 @@ namespace AzureKeyvaultExplorer
                 await foreach (var kv in service.GetKeyvaultsAsync(subItem))
                 {
                     _allVaults.Add(kv);
-                    if (kv.Name.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
+                    if (kv.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
                     {
                         lbVaults.Items.Add(kv);
                     }
@@ -154,7 +153,7 @@ namespace AzureKeyvaultExplorer
             _lastVaultIndex = lbVaults.SelectedIndex;
             try
             {
-                KeyvaultItem? vault = lbVaults.SelectedItem as KeyvaultItem;
+                string? vault = lbVaults.SelectedItem?.ToString();
 
                 if (vault == null)
                     return;
@@ -206,7 +205,7 @@ namespace AzureKeyvaultExplorer
                 btnCopy.Enabled = false;
                 txtValue.Clear();
 
-                KeyvaultItem? vault = lbVaults.SelectedItem as KeyvaultItem;
+                string? vault = lbVaults.SelectedItem?.ToString();
                 string? secretName = lbSecrets.SelectedItem as string;
 
                 if ((vault == null) || (secretName == null))
@@ -270,9 +269,9 @@ namespace AzureKeyvaultExplorer
             txtValue.Clear();
             lbVaults.Items.Clear();
             _lastVaultIndex = -2;
-            foreach (string str in _allVaults.Select(v => v.Name).Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
+            foreach (string str in _allVaults.Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
             {
-                lbVaults.Items.Add(_allVaults.First(v => v.Name == str));
+                lbVaults.Items.Add(_allVaults.First());
             }
         }
 

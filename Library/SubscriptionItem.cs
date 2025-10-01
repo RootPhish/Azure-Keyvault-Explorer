@@ -1,9 +1,8 @@
-﻿namespace AzureKeyvaultExplorer.Classes
+﻿namespace Library
 {
-    internal class KeyvaultItem
+    public class SubscriptionItem
     {
         public string Name { get; set; } = "";
-        public string VaultUri { get; set; } = "";
         public Azure.Core.ResourceIdentifier? ResourceId { get; set; }
 
         public override string ToString() => Name;

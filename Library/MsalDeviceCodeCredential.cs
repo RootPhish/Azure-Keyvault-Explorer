@@ -2,7 +2,7 @@
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Extensions.Msal;
 
-namespace AzureKeyvaultExplorer.Classes
+namespace Library
 {
     public class MsalDeviceCodeCredential : TokenCredential
     {
