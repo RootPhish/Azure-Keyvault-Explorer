@@ -1,20 +1,13 @@
 ﻿using Azure.ResourceManager;
-using AzureKeyvaultExplorer.Classes;
 
-namespace AzureKeyvaultExplorer.Services
+namespace Library
 {
-    internal class AzureSubscriptionService
+    public class AzureSubscriptionService(MsalTokenCredential credential)
     {
-        private MsalTokenCredential _credential;
-
-        public AzureSubscriptionService(MsalTokenCredential credential)
-        {
-            _credential = credential;
-        }
+        private MsalTokenCredential _credential = credential;
 
         public async IAsyncEnumerable<SubscriptionItem> GetSubscriptionsAsync()
         {
-            var result = new List<SubscriptionItem>();
             var arm = new ArmClient(_credential);
             var subs = arm.GetSubscriptions().GetAllAsync();
 
