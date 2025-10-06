@@ -7,6 +7,14 @@ on:
   
 jobs:
   build:
+    strategy:
+      matrix:
+        project: ['AzureKeyvaultExplorer', 'AzureKeyvaultCLI']
+        runtime: ['linux-x64', 'win-x64']
+        exclude:
+          - project: 'AzureKeyvaultExplorer'
+            runtime: 'linux-x64'
+
     runs-on: windows-latest
 
     steps:
@@ -19,15 +27,18 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore the application
-      run: dotnet restore
+      run: dotnet restore ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
 
     - name: Build
-      run: dotnet build 
+      run: dotnet build ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
         --configuration Release
         --no-restore
 
     - name: Publish
-      run: dotnet publish
+      run: dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
         --configuration Release
         --self-contained false
         --no-restore
