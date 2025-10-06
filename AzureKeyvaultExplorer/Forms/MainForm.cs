@@ -194,14 +194,13 @@ namespace AzureKeyvaultExplorer
                 MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
                 return;
             }
-
+            SetReveal(false);
             if ((lbSecrets.SelectedIndex == -1) || (lbSecrets.SelectedIndex == _lastSecretIndex))
                 return;
             _lastSecretIndex = lbSecrets.SelectedIndex;
             try
             {
                 lbSecrets.Enabled = false;
-                btnCopy.Enabled = false;
                 btnCopy.Enabled = false;
                 txtValue.Clear();
 
@@ -226,6 +225,7 @@ namespace AzureKeyvaultExplorer
             finally
             {
                 lbSecrets.Enabled = true;
+                btnCopy.Enabled = true;
                 // Keep focus on the list to allow changing selection with keyboard
                 this.BeginInvoke((Action)(() => lbSecrets.Focus()));
             }
@@ -257,9 +257,14 @@ namespace AzureKeyvaultExplorer
 
         private void ToggleReveal()
         {
-            _revealed = !_revealed;
+            SetReveal(!_revealed);
+        }
+
+        private void SetReveal(bool reveal)
+        {
+            _revealed = reveal;
             txtValue.UseSystemPasswordChar = !_revealed;
-            btnEye.ImageIndex = (btnEye.ImageIndex + 1) % 2;
+            btnEye.ImageIndex = _revealed ? 1 : 0;
         }
 
         private void txtFilter_TextChanged(object sender, EventArgs e)
@@ -271,7 +276,7 @@ namespace AzureKeyvaultExplorer
             _lastVaultIndex = -2;
             foreach (string str in _allVaults.Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
             {
-                lbVaults.Items.Add(_allVaults.First());
+                lbVaults.Items.Add(_allVaults.First(v => v == str));
             }
         }
 
