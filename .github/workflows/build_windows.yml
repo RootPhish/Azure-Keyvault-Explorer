@@ -7,6 +7,10 @@ on:
   
 jobs:
   build:
+    strategy:
+      matrix:
+        project: ['AzureKeyvaultExplorer', 'AzureKeyvaultCLI']
+
     runs-on: windows-latest
 
     steps:
@@ -19,15 +23,15 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore the application
-      run: dotnet restore
+      run: dotnet restore ${{ matrix.project }}/${{ matrix.project }}.csproj
 
     - name: Build
-      run: dotnet build 
+      run: dotnet build ${{ matrix.project }}/${{ matrix.project }}.csproj
         --configuration Release
         --no-restore
 
     - name: Publish
-      run: dotnet publish
+      run: dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj
         --configuration Release
         --self-contained false
         --no-restore
@@ -41,4 +45,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        files: AzureKeyvaultExplorer/bin/Release/net8.0-windows/win-x64/publish/*.exe
+        files: ${{ matrix.project }}/bin/Release/net8.0-windows/win-x64/publish/*.exe
