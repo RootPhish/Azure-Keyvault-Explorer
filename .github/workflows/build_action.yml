@@ -1,4 +1,4 @@
-name: Build application for Windows and Linux
+name: Build CLI application for Windows and Linux
 
 on:
   push:
@@ -9,11 +9,8 @@ jobs:
   build:
     strategy:
       matrix:
-        project: ['AzureKeyvaultExplorer', 'AzureKeyvaultCLI']
+        project: ['AzureKeyvaultCLI']
         runtime: ['linux-x64', 'win-x64']
-        exclude:
-          - project: 'AzureKeyvaultExplorer'
-            runtime: 'linux-x64'
 
     runs-on: windows-latest
 
