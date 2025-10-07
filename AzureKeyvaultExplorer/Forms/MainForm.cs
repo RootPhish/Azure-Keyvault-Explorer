@@ -1,4 +1,5 @@
 using Azure;
+using AzureKeyvaultExplorer.Classes;
 using Library;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,8 @@ namespace AzureKeyvaultExplorer
         private bool _revealed;
         private MsalTokenCredential? _credential;
         private List<string> _allVaults = new();
+
+        AppSettings _settings = SettingsManager.Load();
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
@@ -237,7 +240,7 @@ namespace AzureKeyvaultExplorer
             {
                 Clipboard.SetText(txtValue.Text ?? "");
 
-                _ = ClearClipboardAfterDelayAsync(Properties.Settings.Default.ClearClipboard);
+                _ = ClearClipboardAfterDelayAsync(_settings.ClearClipboardAfterSeconds);
 
                 btnCopy.ImageIndex = 1;
                 await Task.Delay(900);
@@ -300,9 +303,10 @@ namespace AzureKeyvaultExplorer
             }
             try
             {
+                _settings = SettingsManager.Load();
                 _credential = new MsalTokenCredential(
-                    Properties.Settings.Default.ClientID,
-                    Properties.Settings.Default.TenantID);
+                    _settings.ClientID,
+                    _settings.TenantID);
             }
 
             catch
@@ -330,16 +334,16 @@ namespace AzureKeyvaultExplorer
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.ClientID) ||
-                string.IsNullOrWhiteSpace(Properties.Settings.Default.TenantID) ||
-                Properties.Settings.Default.ClientID == "00000000-0000-0000-0000-000000000000" ||
-                Properties.Settings.Default.TenantID == "00000000-0000-0000-0000-000000000000")
+            if (string.IsNullOrWhiteSpace(_settings.ClientID) ||
+                string.IsNullOrWhiteSpace(_settings.TenantID) ||
+                _settings.ClientID == "00000000-0000-0000-0000-000000000000" ||
+                _settings.TenantID == "00000000-0000-0000-0000-000000000000")
             {
                 MessageBox.Show("Missing or incorrect authentication configuration.\nPlease check your Preferences.", "Info");
             }
             _credential = new MsalTokenCredential(
-                Properties.Settings.Default.ClientID,
-                Properties.Settings.Default.TenantID);
+                _settings.ClientID,
+                _settings.TenantID);
         }
     }
 }

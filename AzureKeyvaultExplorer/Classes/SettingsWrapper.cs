@@ -2,22 +2,24 @@
 
 namespace AzureKeyvaultExplorer.Classes
 {
-    internal class SettingsWrapper
+    internal class SettingsWrapper(AppSettings settings)
     {
+        private readonly AppSettings _settings = settings;
+
         [Category("Azure Settings")]
         [Description("The Tenant ID for the App registration in Azure")]
         public string TenantID
         {
-            get => Properties.Settings.Default.TenantID;
-            set => Properties.Settings.Default.TenantID = value;
+            get => _settings.TenantID;
+            set => _settings.TenantID = value;
         }
 
         [Category("Azure Settings")]
         [Description("The Client ID of the App registration in Azure")]
         public string ClientID
         {
-            get => Properties.Settings.Default.ClientID;
-            set => Properties.Settings.Default.ClientID = value;
+            get => _settings.ClientID;
+            set => _settings.ClientID = value;
         }
 
         [Category("Security")]
@@ -25,8 +27,8 @@ namespace AzureKeyvaultExplorer.Classes
         [DisplayName("Clear Clipboard After (seconds)")]
         public int ClearClipboardAfterSeconds
         {
-            get => Properties.Settings.Default.ClearClipboard;
-            set => Properties.Settings.Default.ClearClipboard = value;
+            get => _settings.ClearClipboardAfterSeconds;
+            set => _settings.ClearClipboardAfterSeconds = value;
         }
     }
 }

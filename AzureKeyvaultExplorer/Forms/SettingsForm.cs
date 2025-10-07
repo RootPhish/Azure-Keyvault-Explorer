@@ -4,6 +4,8 @@ namespace AzureKeyvaultExplorer
 {
     public partial class SettingsForm : Form
     {
+        private AppSettings _settings = SettingsManager.Load();
+
         public SettingsForm()
         {
             InitializeComponent();
@@ -11,13 +13,13 @@ namespace AzureKeyvaultExplorer
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.Save();
+            SettingsManager.Save(_settings);
             this.Close();
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-            pgSettings.SelectedObject = new SettingsWrapper();
+            pgSettings.SelectedObject = new SettingsWrapper(_settings);
         }
 
         private void button1_Click(object sender, EventArgs e)
