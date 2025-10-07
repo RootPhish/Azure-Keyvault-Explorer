@@ -1,4 +1,4 @@
-name: Build application for Windows
+name: Build CLI application for Windows and Linux
 
 on:
   push:
@@ -9,7 +9,8 @@ jobs:
   build:
     strategy:
       matrix:
-        project: ['AzureKeyvaultExplorer', 'AzureKeyvaultCLI']
+        project: ['AzureKeyvaultCLI']
+        runtime: ['linux-x64', 'win-x64']
 
     runs-on: windows-latest
 
@@ -22,16 +23,24 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    - name: Clean previous builds
+      run: dotnet clean ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --configuration Release
+        --runtime ${{ matrix.runtime }}
+
     - name: Restore the application
       run: dotnet restore ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
 
     - name: Build
       run: dotnet build ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
         --configuration Release
         --no-restore
 
     - name: Publish
       run: dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj
+        --runtime ${{ matrix.runtime }}
         --configuration Release
         --self-contained false
         --no-restore
@@ -39,10 +48,13 @@ jobs:
         --property:PublishSingleFile=true
 
     - name: List files
-      run: Get-ChildItem -Recurse AzureKeyvaultExplorer\bin
+      run: Get-ChildItem -Recurse ${{ matrix.project }}\bin
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        files: ${{ matrix.project }}/bin/Release/net8.0-windows/win-x64/publish/*.exe
+        files: |
+          ${{ matrix.project }}/bin/Release/net8.0/${{ matrix.runtime }}/publish/*.exe
+          ${{ matrix.project }}/bin/Release/net8.0-windows/${{ matrix.runtime }}/publish/*.exe
+          ${{ matrix.project }}/bin/Release/net8.0/${{ matrix.runtime }}/publish/AzureKeyvaultCLI
