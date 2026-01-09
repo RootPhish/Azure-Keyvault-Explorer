@@ -1,4 +1,4 @@
-name: Build CLI application for Windows and Linux
+name: Build application for Windows
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
   build:
     strategy:
       matrix:
-        project: ['AzureKeyvaultCLI']
-        runtime: ['linux-x64', 'win-x64']
+        project: ['AzureKeyvaultExplorer']
+        runtime: ['win-x64']
 
     runs-on: windows-latest
 
@@ -57,4 +57,4 @@ jobs:
         files: |
           ${{ matrix.project }}/bin/Release/net8.0/${{ matrix.runtime }}/publish/*.exe
           ${{ matrix.project }}/bin/Release/net8.0-windows/${{ matrix.runtime }}/publish/*.exe
-          ${{ matrix.project }}/bin/Release/net8.0/${{ matrix.runtime }}/publish/AzureKeyvaultCLI
+          ${{ matrix.project }}/bin/Release/net8.0/${{ matrix.runtime }}/publish/AzureKeyvaultExplorer
