@@ -215,7 +215,7 @@ namespace AzureKeyvaultExplorer
 
                 var service = new AzureSecretService(_credential);
 
-                if (secretName == "totp") {
+                if (secretName.ToLower() == "totp") {
                     string secretValue = service.GetSecretValue(vault, secretName);
                     string totp = TotpGenerator.GenerateTotp(secretValue);
                     txtValue.Text = totp;
