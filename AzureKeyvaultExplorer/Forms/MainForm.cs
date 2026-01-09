@@ -215,6 +215,12 @@ namespace AzureKeyvaultExplorer
 
                 var service = new AzureSecretService(_credential);
 
+                if (secretName == "totp") {
+                    string secretValue = service.GetSecretValue(vault, secretName);
+                    string totp = TotpGenerator.GenerateTotp(secretValue);
+                    txtValue.Text = totp;
+                    return;
+                }
                 txtValue.Text = service.GetSecretValue(vault, secretName);
             }
             catch (RequestFailedException rfe)
