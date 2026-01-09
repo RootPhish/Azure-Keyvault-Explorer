@@ -69,7 +69,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>NteifV39WcHpyHE/XDQDApI1uB0UoBvHh/bkKBtpBRI=</dsig:DigestValue>
+      <dsig:DigestValue>vSPe53KcXUrIIlyFg1YsazEiKbTxwm7R8gcHnOxfidk=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Library.pdb" size="15524">
@@ -78,7 +78,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>8uF/Qo9fK+Wy3bJhiggFfUj3U8jRwcgjNmjh7EO4kcg=</dsig:DigestValue>
+      <dsig:DigestValue>NBMq8O/XJN1aLGRYk6g9xV8jnwyVUSU54SF4cDCDtzg=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\icon.ico" size="299102">
