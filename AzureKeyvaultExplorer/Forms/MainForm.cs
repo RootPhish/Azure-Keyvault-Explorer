@@ -67,6 +67,8 @@ namespace AzureKeyvaultExplorer
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
+                lblTotp.Visible = false;
+                txtTotp.Visible = false;
 
 
                 var service = new AzureSubscriptionService(_credential);
@@ -107,6 +109,8 @@ namespace AzureKeyvaultExplorer
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
+                lblTotp.Visible = false;
+                txtTotp.Visible = false;
 
                 SubscriptionItem? subItem = lbSubs.SelectedItem as SubscriptionItem;
                 if (subItem == null)
@@ -166,6 +170,8 @@ namespace AzureKeyvaultExplorer
                 btnCopy.Enabled = false;
                 _lastSecretIndex = -2;
                 txtValue.Clear();
+                lblTotp.Visible = false;
+                txtTotp.Visible = false;
 
                 var service = new AzureSecretService(_credential);
 
@@ -215,12 +221,15 @@ namespace AzureKeyvaultExplorer
 
                 var service = new AzureSecretService(_credential);
 
-                if (secretName.ToLower() == "totp") {
+                bool isTotp = secretName.ToLower() == _settings.TOTP.ToLower();
+                if (isTotp) {
                     string secretValue = service.GetSecretValue(vault, secretName);
                     string totp = TotpGenerator.GenerateTotp(secretValue);
-                    txtValue.Text = totp;
-                    return;
+                    txtTotp.Text = totp;
                 }
+                txtTotp.Visible = isTotp;
+                lblTotp.Visible = isTotp;
+
                 txtValue.Text = service.GetSecretValue(vault, secretName);
             }
             catch (RequestFailedException rfe)
