@@ -30,5 +30,14 @@ namespace AzureKeyvaultExplorer.Classes
             get => _settings.ClearClipboardAfterSeconds;
             set => _settings.ClearClipboardAfterSeconds = value;
         }
+
+        [Category("Misc")]
+        [Description("Secret name to be interpreted as TOTP secret")]
+        [DisplayName("TOTP Secret Name")]
+        public string TOTP
+        {
+            get => _settings.TOTP;
+            set => _settings.TOTP = value;
+        }
     }
 }

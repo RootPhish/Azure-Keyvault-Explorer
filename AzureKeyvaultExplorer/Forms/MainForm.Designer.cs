@@ -44,6 +44,8 @@
             lbSubs = new ListBox();
             lbSecrets = new ListBox();
             panelValue = new Panel();
+            lblTotp = new Label();
+            txtTotp = new TextBox();
             btnCopy = new Button();
             btnEye = new Button();
             txtValue = new TextBox();
@@ -123,6 +125,7 @@
             mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             mainTableLayoutPanel.Size = new Size(961, 426);
             mainTableLayoutPanel.TabIndex = 19;
@@ -211,6 +214,8 @@
             // 
             // panelValue
             // 
+            panelValue.Controls.Add(lblTotp);
+            panelValue.Controls.Add(txtTotp);
             panelValue.Controls.Add(btnCopy);
             panelValue.Controls.Add(btnEye);
             panelValue.Controls.Add(txtValue);
@@ -220,6 +225,29 @@
             mainTableLayoutPanel.SetRowSpan(panelValue, 2);
             panelValue.Size = new Size(256, 364);
             panelValue.TabIndex = 23;
+            // 
+            // lblTotp
+            // 
+            lblTotp.Anchor = AnchorStyles.None;
+            lblTotp.AutoSize = true;
+            lblTotp.Location = new Point(0, 39);
+            lblTotp.Name = "lblTotp";
+            lblTotp.Size = new Size(35, 15);
+            lblTotp.TabIndex = 31;
+            lblTotp.Text = "TOTP";
+            lblTotp.TextAlign = ContentAlignment.MiddleLeft;
+            lblTotp.Visible = false;
+            // 
+            // txtTotp
+            // 
+            txtTotp.BackColor = SystemColors.Window;
+            txtTotp.BorderStyle = BorderStyle.FixedSingle;
+            txtTotp.Location = new Point(0, 57);
+            txtTotp.Name = "txtTotp";
+            txtTotp.ReadOnly = true;
+            txtTotp.Size = new Size(196, 23);
+            txtTotp.TabIndex = 24;
+            txtTotp.Visible = false;
             // 
             // btnCopy
             // 
@@ -337,5 +365,7 @@
         private ToolStripStatusLabel statusLabel;
         private ListBox lbVaults;
         private TextBox txtFilter;
+        private Label lblTotp;
+        private TextBox txtTotp;
     }
 }
