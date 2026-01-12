@@ -2,6 +2,7 @@ using Azure;
 using AzureKeyvaultExplorer.Classes;
 using Library;
 using System.Runtime.InteropServices;
+using Timer = System.Windows.Forms.Timer;
 
 namespace AzureKeyvaultExplorer
 {
@@ -14,6 +15,8 @@ namespace AzureKeyvaultExplorer
         private bool _revealed;
         private MsalTokenCredential? _credential;
         private List<string> _allVaults = new();
+        private readonly Timer _timer = new Timer();
+        private string _secret = "";
 
         AppSettings _settings = SettingsManager.Load();
 
@@ -23,6 +26,12 @@ namespace AzureKeyvaultExplorer
         public MainForm()
         {
             InitializeComponent();
+
+            _timer.Interval = 1000;
+            _timer.Tick += (_, __) => RefreshTotp();
+            _timer.Start();
+
+            RefreshTotp();
 
             lbVaults.DisplayMember = "Name";
 
@@ -45,6 +54,11 @@ namespace AzureKeyvaultExplorer
 
         }
 
+        private void RefreshTotp()
+        {
+            txtTotp.Text = TotpGenerator.GenerateTotp(_secret);
+            lblCountdown.Text = $"{SecondsRemaining()}s";
+        }
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
@@ -67,8 +81,7 @@ namespace AzureKeyvaultExplorer
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
-                lblTotp.Visible = false;
-                txtTotp.Visible = false;
+                pnlTotp.Visible = false;
 
 
                 var service = new AzureSubscriptionService(_credential);
@@ -109,8 +122,7 @@ namespace AzureKeyvaultExplorer
                 lbSecrets.Items.Clear();
                 btnCopy.Enabled = false;
                 txtValue.Clear();
-                lblTotp.Visible = false;
-                txtTotp.Visible = false;
+                pnlTotp.Visible = false;
 
                 SubscriptionItem? subItem = lbSubs.SelectedItem as SubscriptionItem;
                 if (subItem == null)
@@ -170,8 +182,7 @@ namespace AzureKeyvaultExplorer
                 btnCopy.Enabled = false;
                 _lastSecretIndex = -2;
                 txtValue.Clear();
-                lblTotp.Visible = false;
-                txtTotp.Visible = false;
+                pnlTotp.Visible = false;
 
                 var service = new AzureSecretService(_credential);
 
@@ -193,6 +204,11 @@ namespace AzureKeyvaultExplorer
             {
                 lbVaults.Enabled = true;
             }
+        }
+        public static int SecondsRemaining(int timestepSeconds = 30)
+        {
+            long unixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            return timestepSeconds - (int)(unixSeconds % timestepSeconds);
         }
 
         private int _lastSecretIndex = -2;
@@ -222,13 +238,14 @@ namespace AzureKeyvaultExplorer
                 var service = new AzureSecretService(_credential);
 
                 bool isTotp = secretName.ToLower() == _settings.TOTP.ToLower();
-                if (isTotp) {
+                if (isTotp)
+                {
                     string secretValue = service.GetSecretValue(vault, secretName);
                     string totp = TotpGenerator.GenerateTotp(secretValue);
                     txtTotp.Text = totp;
+                    _secret = secretValue;
                 }
-                txtTotp.Visible = isTotp;
-                lblTotp.Visible = isTotp;
+                pnlTotp.Visible = isTotp;
 
                 txtValue.Text = service.GetSecretValue(vault, secretName);
             }
@@ -359,6 +376,16 @@ namespace AzureKeyvaultExplorer
             _credential = new MsalTokenCredential(
                 _settings.ClientID,
                 _settings.TenantID);
+        }
+
+        private void panelValue_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void mainTableLayoutPanel_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

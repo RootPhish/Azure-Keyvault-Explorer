@@ -44,6 +44,8 @@
             lbSubs = new ListBox();
             lbSecrets = new ListBox();
             panelValue = new Panel();
+            pnlTotp = new Panel();
+            lblCountdown = new Label();
             lblTotp = new Label();
             txtTotp = new TextBox();
             btnCopy = new Button();
@@ -56,6 +58,7 @@
             mainMenu.SuspendLayout();
             mainTableLayoutPanel.SuspendLayout();
             panelValue.SuspendLayout();
+            pnlTotp.SuspendLayout();
             statusBar.SuspendLayout();
             SuspendLayout();
             // 
@@ -214,8 +217,7 @@
             // 
             // panelValue
             // 
-            panelValue.Controls.Add(lblTotp);
-            panelValue.Controls.Add(txtTotp);
+            panelValue.Controls.Add(pnlTotp);
             panelValue.Controls.Add(btnCopy);
             panelValue.Controls.Add(btnEye);
             panelValue.Controls.Add(txtValue);
@@ -225,29 +227,49 @@
             mainTableLayoutPanel.SetRowSpan(panelValue, 2);
             panelValue.Size = new Size(256, 364);
             panelValue.TabIndex = 23;
+            panelValue.Paint += panelValue_Paint;
+            // 
+            // pnlTotp
+            // 
+            pnlTotp.Controls.Add(lblCountdown);
+            pnlTotp.Controls.Add(lblTotp);
+            pnlTotp.Controls.Add(txtTotp);
+            pnlTotp.Location = new Point(0, 30);
+            pnlTotp.Name = "pnlTotp";
+            pnlTotp.Size = new Size(256, 85);
+            pnlTotp.TabIndex = 33;
+            pnlTotp.Visible = false;
+            // 
+            // lblCountdown
+            // 
+            lblCountdown.Anchor = AnchorStyles.None;
+            lblCountdown.AutoSize = true;
+            lblCountdown.Location = new Point(202, 30);
+            lblCountdown.Name = "lblCountdown";
+            lblCountdown.Size = new Size(0, 15);
+            lblCountdown.TabIndex = 35;
+            lblCountdown.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTotp
             // 
             lblTotp.Anchor = AnchorStyles.None;
             lblTotp.AutoSize = true;
-            lblTotp.Location = new Point(0, 39);
+            lblTotp.Location = new Point(-1, 10);
             lblTotp.Name = "lblTotp";
             lblTotp.Size = new Size(35, 15);
-            lblTotp.TabIndex = 31;
+            lblTotp.TabIndex = 34;
             lblTotp.Text = "TOTP";
             lblTotp.TextAlign = ContentAlignment.MiddleLeft;
-            lblTotp.Visible = false;
             // 
             // txtTotp
             // 
             txtTotp.BackColor = SystemColors.Window;
             txtTotp.BorderStyle = BorderStyle.FixedSingle;
-            txtTotp.Location = new Point(0, 57);
+            txtTotp.Location = new Point(0, 28);
             txtTotp.Name = "txtTotp";
             txtTotp.ReadOnly = true;
             txtTotp.Size = new Size(196, 23);
-            txtTotp.TabIndex = 24;
-            txtTotp.Visible = false;
+            txtTotp.TabIndex = 33;
             // 
             // btnCopy
             // 
@@ -336,6 +358,8 @@
             mainTableLayoutPanel.PerformLayout();
             panelValue.ResumeLayout(false);
             panelValue.PerformLayout();
+            pnlTotp.ResumeLayout(false);
+            pnlTotp.PerformLayout();
             statusBar.ResumeLayout(false);
             statusBar.PerformLayout();
             ResumeLayout(false);
@@ -350,10 +374,6 @@
         private ToolStripSeparator menuSeparator;
         private TableLayoutPanel mainTableLayoutPanel;
         private ListBox lbSecrets;
-        private Panel panelValue;
-        private Button btnCopy;
-        private Button btnEye;
-        private TextBox txtValue;
         private ListBox lbSubs;
         private Label lblValue;
         private Label lblSecrets;
@@ -365,7 +385,13 @@
         private ToolStripStatusLabel statusLabel;
         private ListBox lbVaults;
         private TextBox txtFilter;
+        private Panel panelValue;
+        private Panel pnlTotp;
+        private Label lblCountdown;
         private Label lblTotp;
         private TextBox txtTotp;
+        private Button btnCopy;
+        private Button btnEye;
+        private TextBox txtValue;
     }
 }
