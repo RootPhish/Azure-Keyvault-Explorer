@@ -45,6 +45,7 @@
             lbSecrets = new ListBox();
             panelValue = new Panel();
             pnlTotp = new Panel();
+            btnCopyTotp = new Button();
             lblCountdown = new Label();
             lblTotp = new Label();
             txtTotp = new TextBox();
@@ -227,10 +228,10 @@
             mainTableLayoutPanel.SetRowSpan(panelValue, 2);
             panelValue.Size = new Size(256, 364);
             panelValue.TabIndex = 23;
-            panelValue.Paint += panelValue_Paint;
             // 
             // pnlTotp
             // 
+            pnlTotp.Controls.Add(btnCopyTotp);
             pnlTotp.Controls.Add(lblCountdown);
             pnlTotp.Controls.Add(lblTotp);
             pnlTotp.Controls.Add(txtTotp);
@@ -239,6 +240,19 @@
             pnlTotp.Size = new Size(256, 85);
             pnlTotp.TabIndex = 33;
             pnlTotp.Visible = false;
+            // 
+            // btnCopyTotp
+            // 
+            btnCopyTotp.BackgroundImageLayout = ImageLayout.Zoom;
+            btnCopyTotp.FlatAppearance.BorderSize = 0;
+            btnCopyTotp.FlatStyle = FlatStyle.Flat;
+            btnCopyTotp.ImageIndex = 0;
+            btnCopyTotp.Location = new Point(227, 29);
+            btnCopyTotp.Name = "btnCopyTotp";
+            btnCopyTotp.Size = new Size(20, 20);
+            btnCopyTotp.TabIndex = 36;
+            btnCopyTotp.TabStop = false;
+            btnCopyTotp.UseVisualStyleBackColor = true;
             // 
             // lblCountdown
             // 
@@ -393,5 +407,6 @@
         private Button btnCopy;
         private Button btnEye;
         private TextBox txtValue;
+        private Button btnCopyTotp;
     }
 }

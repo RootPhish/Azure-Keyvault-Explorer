@@ -39,6 +39,7 @@ namespace AzureKeyvaultExplorer
 
             btnEye.Click += (_, __) => ToggleReveal();
             btnCopy.Click += async (_, __) => await CopyPasswordAsync();
+            btnCopyTotp.Click += async (_, __) => await CopyTotpAsync();
             connectToolStripMenuItem.Click += async (_, __) => await LoadSubsAsync();
             lbSubs.SelectedIndexChanged += async (_, __) => await LoadVaultsAsync();
             lbVaults.SelectedIndexChanged += async (_, __) => await LoadSecretsAsync();
@@ -52,6 +53,9 @@ namespace AzureKeyvaultExplorer
             btnCopy.ImageList.Images.Add(Properties.Resources.copy);
             btnCopy.ImageList.Images.Add(Properties.Resources.check);
 
+            btnCopyTotp.ImageList = new();
+            btnCopyTotp.ImageList.Images.Add(Properties.Resources.copy);
+            btnCopyTotp.ImageList.Images.Add(Properties.Resources.check);
         }
 
         private void RefreshTotp()
@@ -266,6 +270,24 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private async Task CopyTotpAsync()
+        {
+            try
+            {
+                Clipboard.SetText(txtTotp.Text ?? "");
+
+                _ = ClearClipboardAfterDelayAsync(_settings.ClearClipboardAfterSeconds);
+
+                btnCopyTotp.ImageIndex = 1;
+                await Task.Delay(900);
+                btnCopyTotp.ImageIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to copy to clipboard:\n{ex.Message}", "Error");
+            }
+        }
+
         private async Task CopyPasswordAsync()
         {
             try
@@ -319,7 +341,10 @@ namespace AzureKeyvaultExplorer
         {
             if (keyData == (Keys.Control | Keys.C))
             {
-                _ = CopyPasswordAsync();
+                if (pnlTotp.Visible)
+                    _ = CopyTotpAsync();
+                else 
+                    _ = CopyPasswordAsync();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -376,16 +401,6 @@ namespace AzureKeyvaultExplorer
             _credential = new MsalTokenCredential(
                 _settings.ClientID,
                 _settings.TenantID);
-        }
-
-        private void panelValue_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void mainTableLayoutPanel_Paint(object sender, PaintEventArgs e)
-        {
-
         }
     }
 }
