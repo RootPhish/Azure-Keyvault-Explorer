@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             tableLayoutPanel1 = new TableLayoutPanel();
-            button1 = new Button();
+            btnCancel = new Button();
             btnOK = new Button();
             pgSettings = new PropertyGrid();
             tableLayoutPanel1.SuspendLayout();
@@ -40,7 +40,7 @@
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Controls.Add(button1, 1, 1);
+            tableLayoutPanel1.Controls.Add(btnCancel, 1, 1);
             tableLayoutPanel1.Controls.Add(btnOK, 0, 1);
             tableLayoutPanel1.Controls.Add(pgSettings, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
@@ -52,17 +52,17 @@
             tableLayoutPanel1.Size = new Size(514, 391);
             tableLayoutPanel1.TabIndex = 7;
             // 
-            // button1
+            // btnCancel
             // 
-            button1.DialogResult = DialogResult.Cancel;
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(260, 352);
-            button1.Margin = new Padding(3, 6, 3, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 24);
-            button1.TabIndex = 8;
-            button1.Text = "Cancel";
-            button1.UseVisualStyleBackColor = true;
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.Location = new Point(260, 352);
+            btnCancel.Margin = new Padding(3, 6, 3, 3);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(75, 24);
+            btnCancel.TabIndex = 8;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
             // 
             // btnOK
             // 
@@ -105,7 +105,7 @@
         #endregion
 
         private TableLayoutPanel tableLayoutPanel1;
-        private Button button1;
+        private Button btnCancel;
         private Button btnOK;
         private PropertyGrid pgSettings;
     }

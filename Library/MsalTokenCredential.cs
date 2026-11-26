@@ -14,6 +14,8 @@ namespace Library
                 .WithAuthority(AzureCloudInstance.AzurePublic, tenantId)
                 .WithRedirectUri("http://localhost") // must match app registration
                 .Build();
+
+            MsalTokenCache.Register(_app.UserTokenCache);
         }
 
         public override async ValueTask<AccessToken> GetTokenAsync(

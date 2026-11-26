@@ -1,13 +1,11 @@
 ﻿using Azure.Core;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Extensions.Msal;
 
 namespace Library
 {
     public class MsalDeviceCodeCredential : TokenCredential
     {
         private readonly IPublicClientApplication _app;
-        private readonly MsalCacheHelper _cacheHelper;
 
         public MsalDeviceCodeCredential(string clientId, string tenantId = "common")
         {
@@ -17,23 +15,7 @@ namespace Library
                 .WithRedirectUri("http://localhost") // must match app registration
                 .Build();
 
-            var storageProps = new StorageCreationPropertiesBuilder(
-                    cacheFileName: "azurekeyvaultexplorer.msalcache",
-                    cacheDirectory: MsalCacheHelper.UserRootDirectory)
-                .WithLinuxKeyring(
-                    schemaName: "com.contoso.azurekeyvaultexplorer",
-                    collection: "default",
-                    secretLabel: "MSAL token cache for Azure Keyvault Explorer",
-                    attribute1: new KeyValuePair<string, string>("Version", "1"),
-                    attribute2: new KeyValuePair<string, string>("Product", "AzureKeyvaultExplorer"))
-                .WithMacKeyChain(
-                    serviceName: "com.contoso.azurekeyvaultexplorer",
-                    accountName: "AzureKeyvaultExplorer")
-                .Build();
-
-            var cacheHelperTask = MsalCacheHelper.CreateAsync(storageProps, null);
-            _cacheHelper = cacheHelperTask.GetAwaiter().GetResult();
-            _cacheHelper.RegisterCache(_app.UserTokenCache);
+            MsalTokenCache.Register(_app.UserTokenCache);
         }
 
         public override async ValueTask<AccessToken> GetTokenAsync(
