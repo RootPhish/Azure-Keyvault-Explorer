@@ -2,16 +2,13 @@
 
 namespace Library
 {
-    public class AzureSubscriptionService(MsalTokenCredential credential)
+    public class AzureSubscriptionService(ArmClient arm)
     {
-        private MsalTokenCredential _credential = credential;
+        private readonly ArmClient _arm = arm;
 
         public async IAsyncEnumerable<SubscriptionItem> GetSubscriptionsAsync()
         {
-            var arm = new ArmClient(_credential);
-            var subs = arm.GetSubscriptions().GetAllAsync();
-
-            await foreach (var sub in subs)
+            await foreach (var sub in _arm.GetSubscriptions().GetAllAsync())
             {
                 yield return new SubscriptionItem
                 {

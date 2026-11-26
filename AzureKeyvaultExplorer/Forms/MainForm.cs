@@ -1,4 +1,5 @@
-using Azure;
+﻿using Azure;
+using Azure.ResourceManager;
 using AzureKeyvaultExplorer.Classes;
 using Library;
 using System.Runtime.InteropServices;
@@ -14,9 +15,27 @@ namespace AzureKeyvaultExplorer
 
         private bool _revealed;
         private MsalTokenCredential? _credential;
-        private List<string> _allVaults = new();
+        private ArmClient? _arm;
+        private AzureSecretService? _secretService;
+
+        // Vaults for all subscriptions, loaded with one Resource Graph query after connecting.
+        // Kept as a task so selecting a subscription while it is still loading simply awaits it.
+        private Task<Dictionary<string, List<VaultItem>>>? _vaultsTask;
+        private List<VaultItem> _allVaults = new();
+
+        // Secret names per vault, kept for the session (cleared by Refresh / Connect).
+        private readonly Dictionary<Uri, List<string>> _secretCache = new();
+        private List<string> _allSecrets = new();
+        private CancellationTokenSource? _secretsCts;
+
+        // The secret filter box is only shown for vaults with at least this many secrets.
+        private const int SecretFilterThreshold = 20;
+
         private readonly Timer _timer = new Timer();
         private string _secret = "";
+
+        // Incremented whenever the displayed secret should change, so slower, outdated requests are ignored.
+        private int _secretRequest;
 
         AppSettings _settings = SettingsManager.Load();
 
@@ -41,9 +60,13 @@ namespace AzureKeyvaultExplorer
             btnCopy.Click += async (_, __) => await CopyPasswordAsync();
             btnCopyTotp.Click += async (_, __) => await CopyTotpAsync();
             connectToolStripMenuItem.Click += async (_, __) => await LoadSubsAsync();
+            refreshToolStripMenuItem.Click += async (_, __) => await RefreshVaultsAsync();
             lbSubs.SelectedIndexChanged += async (_, __) => await LoadVaultsAsync();
             lbVaults.SelectedIndexChanged += async (_, __) => await LoadSecretsAsync();
-            lbSecrets.SelectedIndexChanged += (_, __) => GetSecretValue();
+            lbSecrets.SelectedIndexChanged += async (_, __) => await GetSecretValueAsync();
+            txtSecretFilter.TextChanged += (_, __) => ApplySecretFilter();
+            txtSecretFilter.KeyDown += txtSecretFilter_KeyDown;
+            UpdateSecretFilterVisibility(force: true);
 
             btnEye.ImageList = new();
             btnEye.ImageList.Images.Add(Properties.Resources.eye_open);
@@ -69,36 +92,87 @@ namespace AzureKeyvaultExplorer
             SetWindowDisplayAffinity(this.Handle, WDA_EXCLUDEFROMCAPTURE);
         }
 
+        private void SetCredential()
+        {
+            _credential = new MsalTokenCredential(_settings.ClientID, _settings.TenantID);
+            _arm = new ArmClient(_credential);
+            _secretService = new AzureSecretService(_credential);
+            _vaultsTask = null;
+            _secretCache.Clear();
+        }
+
+        private bool EnsureConnected()
+        {
+            if (_arm != null && _secretService != null)
+                return true;
+
+            MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            return false;
+        }
+
+        private void ClearSecretValue()
+        {
+            _secretRequest++;
+            _lastSecretIndex = -2;
+            btnCopy.Enabled = false;
+            txtValue.Clear();
+            pnlTotp.Visible = false;
+            _secret = "";
+        }
+
+        private void ClearSecretView()
+        {
+            // Stop any secret list that is still loading for the previously selected vault.
+            _secretsCts?.Cancel();
+            _secretsCts = null;
+
+            ClearSecretValue();
+            _allSecrets = new();
+            lbSecrets.Items.Clear();
+            UpdateSecretFilterVisibility();
+            UpdateSecretCountLabel();
+        }
+
+        private void ClearVaultView()
+        {
+            _lastVaultIndex = -2;
+            _allVaults = new();
+            lbVaults.Items.Clear();
+            ClearSecretView();
+        }
+
         private async Task LoadSubsAsync()
         {
-            if (_credential == null)
-            {
-                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            if (!EnsureConnected())
                 return;
-            }
 
             try
             {
+                _lastSubIndex = -2;
+                _vaultsTask = null;
+                _secretCache.Clear();
                 lbSubs.Items.Clear();
-                lbVaults.Items.Clear();
-                _allVaults.Clear();
-                lbSecrets.Items.Clear();
-                btnCopy.Enabled = false;
-                txtValue.Clear();
-                pnlTotp.Visible = false;
+                ClearVaultView();
 
-
-                var service = new AzureSubscriptionService(_credential);
-
+                var service = new AzureSubscriptionService(_arm!);
+                var subs = new List<SubscriptionItem>();
                 await foreach (var sub in service.GetSubscriptionsAsync())
                 {
-                    lbSubs.Items.Add(sub);
+                    subs.Add(sub);
                 }
 
-                if (lbSubs.Items.Count == 0)
+                lbSubs.BeginUpdate();
+                lbSubs.Items.AddRange(subs.ToArray());
+                lbSubs.EndUpdate();
+
+                if (subs.Count == 0)
                 {
                     MessageBox.Show("No Subscriptions found for your account.", "Info");
+                    return;
                 }
+
+                // Start loading the vaults of all subscriptions in the background right away.
+                _ = StartVaultLoad();
             }
             catch (Exception ex)
             {
@@ -106,55 +180,88 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private Task<Dictionary<string, List<VaultItem>>> StartVaultLoad()
+        {
+            var subIds = lbSubs.Items
+                .OfType<SubscriptionItem>()
+                .Select(s => s.ResourceId?.Name)
+                .OfType<string>()
+                .ToList();
+
+            _vaultsTask = new AzureKeyvaultService(_arm!).GetKeyvaultsBySubscriptionAsync(subIds);
+            return _vaultsTask;
+        }
+
+        private async Task RefreshVaultsAsync()
+        {
+            if (!EnsureConnected())
+                return;
+
+            if (lbSubs.Items.Count == 0)
+            {
+                await LoadSubsAsync();
+                return;
+            }
+
+            _secretCache.Clear();
+            _ = StartVaultLoad();
+            _lastSubIndex = -2;
+            await LoadVaultsAsync();
+        }
+
         private int _lastSubIndex = -2;
         private async Task LoadVaultsAsync()
         {
-            if (_credential == null)
-            {
-                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            if (!EnsureConnected())
                 return;
-            }
 
             if ((lbSubs.SelectedIndex == -1) || (lbSubs.SelectedIndex == _lastSubIndex))
                 return;
             _lastSubIndex = lbSubs.SelectedIndex;
+
+            if (lbSubs.SelectedItem is not SubscriptionItem subItem)
+                return;
+
+            ClearVaultView();
+
             try
             {
-                lbSubs.Enabled = false;
-                lbVaults.Items.Clear();
-                _allVaults.Clear();
-                lbSecrets.Items.Clear();
-                btnCopy.Enabled = false;
-                txtValue.Clear();
-                pnlTotp.Visible = false;
-
-                SubscriptionItem? subItem = lbSubs.SelectedItem as SubscriptionItem;
-                if (subItem == null)
-                    return;
-
-                progressBar.Style = ProgressBarStyle.Marquee;
-                statusLabel.Text = "Loading vaults...";
-
-                var service = new AzureKeyvaultService(_credential);
-
-                await foreach (var kv in service.GetKeyvaultsAsync(subItem))
+                var task = _vaultsTask ?? StartVaultLoad();
+                if (!task.IsCompleted)
                 {
-                    _allVaults.Add(kv);
-                    if (kv.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
-                    {
-                        lbVaults.Items.Add(kv);
-                    }
+                    lbSubs.Enabled = false;
+                    progressBar.Style = ProgressBarStyle.Marquee;
+                    statusLabel.Text = "Loading vaults...";
                 }
+
+                var vaultsBySub = await task;
+
+                // The subscription list may have been reloaded (Connect) while we were waiting.
+                if (!ReferenceEquals(lbSubs.SelectedItem, subItem))
+                {
+                    progressBar.Style = ProgressBarStyle.Blocks;
+                    statusLabel.Text = "";
+                    return;
+                }
+
+                _allVaults = vaultsBySub.TryGetValue(subItem.ResourceId?.Name ?? "", out var vaults)
+                    ? vaults
+                    : new();
+                ApplyVaultFilter();
+
                 progressBar.Style = ProgressBarStyle.Blocks;
                 progressBar.Value = 100;
                 statusLabel.Text = $"Loaded {_allVaults.Count} vaults.";
             }
-            catch
+            catch (Exception ex)
             {
+                // Allow a retry (re-select the subscription or press F5 / Refresh).
+                _vaultsTask = null;
+                _lastSubIndex = -2;
                 progressBar.Style = ProgressBarStyle.Blocks;
                 progressBar.Value = 0;
                 statusLabel.Text = "";
-                MessageBox.Show($"Failed to load vaults for selected subscription.\nDo you have the correct authorizations?", "Error");
+                MessageBox.Show($"Failed to load vaults:\n{ex.Message}\n\nDo you have the correct authorizations?", "Error");
             }
             finally
             {
@@ -162,53 +269,176 @@ namespace AzureKeyvaultExplorer
             }
         }
 
+        private void ApplyVaultFilter()
+        {
+            var filtered = _allVaults
+                .Where(v => v.Name.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            lbVaults.BeginUpdate();
+            lbVaults.Items.Clear();
+            lbVaults.Items.AddRange(filtered);
+            lbVaults.EndUpdate();
+        }
+
         private int _lastVaultIndex = -2;
         private async Task LoadSecretsAsync()
         {
-            if (_credential == null)
-            {
-                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            if (!EnsureConnected())
                 return;
-            }
 
             if ((lbVaults.SelectedIndex == -1) || (lbVaults.SelectedIndex == _lastVaultIndex))
                 return;
             _lastVaultIndex = lbVaults.SelectedIndex;
+
+            if (lbVaults.SelectedItem is not VaultItem vault)
+                return;
+
+            ClearSecretView();
+
+            if (_secretCache.TryGetValue(vault.VaultUri, out var cached))
+            {
+                AddSecrets(cached);
+                statusLabel.Text = $"Loaded {cached.Count} secrets.";
+                return;
+            }
+
+            // The vault list stays usable while loading: picking another vault cancels this load.
+            var cts = new CancellationTokenSource();
+            _secretsCts = cts;
+            var loaded = new List<string>();
             try
             {
-                string? vault = lbVaults.SelectedItem?.ToString();
+                progressBar.Style = ProgressBarStyle.Marquee;
+                statusLabel.Text = "Loading secrets...";
 
-                if (vault == null)
-                    return;
-
-                lbVaults.Enabled = false;
-                lbSecrets.Items.Clear();
-                btnCopy.Enabled = false;
-                _lastSecretIndex = -2;
-                txtValue.Clear();
-                pnlTotp.Visible = false;
-
-                var service = new AzureSecretService(_credential);
-
-                await foreach (var secret in service.GetSecretsAsync(vault))
+                await foreach (var page in _secretService!.GetSecretPagesAsync(vault.VaultUri, cts.Token))
                 {
-                    lbSecrets.Items.Add(secret);
+                    if (cts.IsCancellationRequested)
+                        return;
+                    loaded.AddRange(page);
+                    AddSecrets(page);
                 }
 
-                if (lbSecrets.Items.Count != 0)
-                {
-                    lbSecrets.SelectedIndex = 0;
-                }
+                _secretCache[vault.VaultUri] = loaded;
+                statusLabel.Text = $"Loaded {loaded.Count} secrets.";
+            }
+            catch (OperationCanceledException) when (cts.IsCancellationRequested)
+            {
+                // Another vault was selected; nothing to do.
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load secrets:\n{ex.Message}", "Error");
+                if (!cts.IsCancellationRequested)
+                {
+                    statusLabel.Text = "";
+                    MessageBox.Show($"Failed to load secrets:\n{ex.Message}", "Error");
+                }
             }
             finally
             {
-                lbVaults.Enabled = true;
+                if (ReferenceEquals(_secretsCts, cts))
+                    _secretsCts = null;
+
+                // Only stop the progress bar if no newer secret load has taken over.
+                if (_secretsCts == null)
+                {
+                    progressBar.Style = ProgressBarStyle.Blocks;
+                    progressBar.Value = 100;
+                }
+                cts.Dispose();
             }
         }
+
+        private bool MatchesSecretFilter(string name) =>
+            name.Contains(txtSecretFilter.Text, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Appends newly loaded secret names, showing those that match the filter.</summary>
+        private void AddSecrets(IReadOnlyList<string> names)
+        {
+            _allSecrets.AddRange(names);
+            UpdateSecretFilterVisibility();
+
+            var matches = names.Where(MatchesSecretFilter).ToArray();
+            if (matches.Length > 0)
+            {
+                lbSecrets.BeginUpdate();
+                lbSecrets.Items.AddRange(matches);
+                lbSecrets.EndUpdate();
+            }
+
+            // Select the first secret as soon as the first page arrives, so its value loads
+            // while the remaining pages are still coming in. Never override the user's choice.
+            if (lbSecrets.SelectedIndex == -1 && lbSecrets.Items.Count > 0)
+                lbSecrets.SelectedIndex = 0;
+
+            UpdateSecretCountLabel();
+        }
+
+        private void ApplySecretFilter()
+        {
+            string? selected = lbSecrets.SelectedItem as string;
+            var matches = _allSecrets.Where(MatchesSecretFilter).ToArray();
+
+            lbSecrets.BeginUpdate();
+            lbSecrets.Items.Clear();
+            lbSecrets.Items.AddRange(matches);
+            lbSecrets.EndUpdate();
+
+            // Keep the current secret (without re-fetching it) if it still matches.
+            int index = selected == null ? -1 : lbSecrets.Items.IndexOf(selected);
+            if (index >= 0)
+            {
+                _lastSecretIndex = index;
+                lbSecrets.SelectedIndex = index;
+            }
+            else
+            {
+                ClearSecretValue();
+            }
+
+            UpdateSecretFilterVisibility();
+            UpdateSecretCountLabel();
+        }
+
+        private void UpdateSecretFilterVisibility(bool force = false)
+        {
+            bool show = _allSecrets.Count >= SecretFilterThreshold || txtSecretFilter.TextLength > 0;
+            if (!force && txtSecretFilter.Visible == show)
+                return;
+
+            mainTableLayoutPanel.SuspendLayout();
+            txtSecretFilter.Visible = show;
+            mainTableLayoutPanel.SetRow(lbSecrets, show ? 2 : 1);
+            mainTableLayoutPanel.SetRowSpan(lbSecrets, show ? 1 : 2);
+            mainTableLayoutPanel.ResumeLayout();
+        }
+
+        private void UpdateSecretCountLabel()
+        {
+            int total = _allSecrets.Count;
+            int shown = lbSecrets.Items.Count;
+            lblSecrets.Text = total == 0 ? "Secrets"
+                : shown == total ? $"Secrets ({total})"
+                : $"Secrets ({shown} of {total})";
+        }
+
+        private void txtSecretFilter_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down && lbSecrets.Items.Count > 0)
+            {
+                lbSecrets.Focus();
+                if (lbSecrets.SelectedIndex == -1)
+                    lbSecrets.SelectedIndex = 0;
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                txtSecretFilter.Clear();
+                e.Handled = e.SuppressKeyPress = true;
+            }
+        }
+
         public static int SecondsRemaining(int timestepSeconds = 30)
         {
             long unixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -216,57 +446,54 @@ namespace AzureKeyvaultExplorer
         }
 
         private int _lastSecretIndex = -2;
-        private void GetSecretValue()
+        private async Task GetSecretValueAsync()
         {
-            if (_credential == null)
-            {
-                MessageBox.Show("Invalid authentication configuration. Please check your Preferences.");
+            if (!EnsureConnected())
                 return;
-            }
+
             SetReveal(false);
             if ((lbSecrets.SelectedIndex == -1) || (lbSecrets.SelectedIndex == _lastSecretIndex))
                 return;
             _lastSecretIndex = lbSecrets.SelectedIndex;
+
+            if (lbVaults.SelectedItem is not VaultItem vault || lbSecrets.SelectedItem is not string secretName)
+                return;
+
+            int request = ++_secretRequest;
+            btnCopy.Enabled = false;
+            txtValue.Clear();
+            pnlTotp.Visible = false;
+            _secret = "";
+
             try
             {
-                lbSecrets.Enabled = false;
-                btnCopy.Enabled = false;
-                txtValue.Clear();
+                // Fetched once, asynchronously, so the UI stays responsive.
+                string secretValue = await _secretService!.GetSecretValueAsync(vault.VaultUri, secretName);
 
-                string? vault = lbVaults.SelectedItem?.ToString();
-                string? secretName = lbSecrets.SelectedItem as string;
-
-                if ((vault == null) || (secretName == null))
+                // The user selected another secret (or vault) in the meantime.
+                if (request != _secretRequest)
                     return;
 
-                var service = new AzureSecretService(_credential);
-
-                bool isTotp = secretName.ToLower() == _settings.TOTP.ToLower();
+                bool isTotp = string.Equals(secretName, _settings.TOTP, StringComparison.OrdinalIgnoreCase);
                 if (isTotp)
                 {
-                    string secretValue = service.GetSecretValue(vault, secretName);
-                    string totp = TotpGenerator.GenerateTotp(secretValue);
-                    txtTotp.Text = totp;
                     _secret = secretValue;
+                    txtTotp.Text = TotpGenerator.GenerateTotp(secretValue);
                 }
                 pnlTotp.Visible = isTotp;
 
-                txtValue.Text = service.GetSecretValue(vault, secretName);
+                txtValue.Text = secretValue;
+                btnCopy.Enabled = true;
             }
             catch (RequestFailedException rfe)
             {
-                MessageBox.Show($"Azure request failed:\n{rfe.Message}", "Error");
+                if (request == _secretRequest)
+                    MessageBox.Show($"Azure request failed:\n{rfe.Message}", "Error");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to get secret value:\n{ex.Message}", "Error");
-            }
-            finally
-            {
-                lbSecrets.Enabled = true;
-                btnCopy.Enabled = true;
-                // Keep focus on the list to allow changing selection with keyboard
-                this.BeginInvoke((Action)(() => lbSecrets.Focus()));
+                if (request == _secretRequest)
+                    MessageBox.Show($"Failed to get secret value:\n{ex.Message}", "Error");
             }
         }
 
@@ -326,15 +553,9 @@ namespace AzureKeyvaultExplorer
 
         private void txtFilter_TextChanged(object sender, EventArgs e)
         {
-            lbSecrets.Items.Clear();
-            btnCopy.Enabled = false;
-            txtValue.Clear();
-            lbVaults.Items.Clear();
             _lastVaultIndex = -2;
-            foreach (string str in _allVaults.Where(n => n.Contains(txtFilter.Text, StringComparison.OrdinalIgnoreCase)))
-            {
-                lbVaults.Items.Add(_allVaults.First(v => v == str));
-            }
+            ClearSecretView();
+            ApplyVaultFilter();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -343,8 +564,13 @@ namespace AzureKeyvaultExplorer
             {
                 if (pnlTotp.Visible)
                     _ = CopyTotpAsync();
-                else 
+                else
                     _ = CopyPasswordAsync();
+                return true;
+            }
+            if (keyData == Keys.F5)
+            {
+                _ = RefreshVaultsAsync();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -361,9 +587,7 @@ namespace AzureKeyvaultExplorer
             try
             {
                 _settings = SettingsManager.Load();
-                _credential = new MsalTokenCredential(
-                    _settings.ClientID,
-                    _settings.TenantID);
+                SetCredential();
             }
 
             catch
@@ -386,7 +610,6 @@ namespace AzureKeyvaultExplorer
                     lbVaults.SelectedIndex = 0;
                 }
             }
-            Console.WriteLine(e.KeyCode);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -398,9 +621,14 @@ namespace AzureKeyvaultExplorer
             {
                 MessageBox.Show("Missing or incorrect authentication configuration.\nPlease check your Preferences.", "Info");
             }
-            _credential = new MsalTokenCredential(
-                _settings.ClientID,
-                _settings.TenantID);
+            try
+            {
+                SetCredential();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to initialise authentication:\n{ex.Message}", "Error");
+            }
         }
     }
 }

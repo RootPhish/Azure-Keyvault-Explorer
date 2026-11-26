@@ -35,6 +35,7 @@
             menuSeparator = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
+            refreshToolStripMenuItem = new ToolStripMenuItem();
             mainTableLayoutPanel = new TableLayoutPanel();
             lbVaults = new ListBox();
             txtFilter = new TextBox();
@@ -43,6 +44,7 @@
             lblKeyvaults = new Label();
             lbSubs = new ListBox();
             lbSecrets = new ListBox();
+            txtSecretFilter = new TextBox();
             panelValue = new Panel();
             pnlTotp = new Panel();
             btnCopyTotp = new Button();
@@ -65,7 +67,7 @@
             // 
             // mainMenu
             // 
-            mainMenu.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, connectToolStripMenuItem });
+            mainMenu.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, connectToolStripMenuItem, refreshToolStripMenuItem });
             mainMenu.Location = new Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Size = new Size(961, 24);
@@ -104,6 +106,13 @@
             connectToolStripMenuItem.Size = new Size(64, 20);
             connectToolStripMenuItem.Text = "Connect";
             // 
+            // refreshToolStripMenuItem
+            // 
+            refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            refreshToolStripMenuItem.Size = new Size(58, 20);
+            refreshToolStripMenuItem.Text = "Refresh";
+            refreshToolStripMenuItem.ToolTipText = "Reload vaults and secrets (F5)";
+            // 
             // mainTableLayoutPanel
             // 
             mainTableLayoutPanel.ColumnCount = 4;
@@ -117,7 +126,8 @@
             mainTableLayoutPanel.Controls.Add(lblSecrets, 2, 0);
             mainTableLayoutPanel.Controls.Add(lblKeyvaults, 1, 0);
             mainTableLayoutPanel.Controls.Add(lbSubs, 0, 1);
-            mainTableLayoutPanel.Controls.Add(lbSecrets, 2, 1);
+            mainTableLayoutPanel.Controls.Add(txtSecretFilter, 2, 1);
+            mainTableLayoutPanel.Controls.Add(lbSecrets, 2, 2);
             mainTableLayoutPanel.Controls.Add(panelValue, 3, 1);
             mainTableLayoutPanel.Controls.Add(lblSubscriptions, 0, 0);
             mainTableLayoutPanel.Controls.Add(statusBar, 0, 3);
@@ -153,6 +163,7 @@
             txtFilter.Location = new Point(237, 36);
             txtFilter.Name = "txtFilter";
             txtFilter.Size = new Size(225, 23);
+            txtFilter.PlaceholderText = "Filter vaults";
             txtFilter.TabIndex = 33;
             txtFilter.TextChanged += txtFilter_TextChanged;
             txtFilter.KeyDown += txtFilter_KeyDown;
@@ -210,11 +221,20 @@
             lbSecrets.FormattingEnabled = true;
             lbSecrets.IntegralHeight = false;
             lbSecrets.ItemHeight = 15;
-            lbSecrets.Location = new Point(468, 36);
+            lbSecrets.Location = new Point(468, 66);
             lbSecrets.Name = "lbSecrets";
-            mainTableLayoutPanel.SetRowSpan(lbSecrets, 2);
-            lbSecrets.Size = new Size(225, 364);
+            lbSecrets.Size = new Size(225, 334);
             lbSecrets.TabIndex = 13;
+            // 
+            // txtSecretFilter
+            // 
+            txtSecretFilter.BorderStyle = BorderStyle.FixedSingle;
+            txtSecretFilter.Dock = DockStyle.Fill;
+            txtSecretFilter.Location = new Point(468, 36);
+            txtSecretFilter.Name = "txtSecretFilter";
+            txtSecretFilter.PlaceholderText = "Filter secrets";
+            txtSecretFilter.Size = new Size(225, 23);
+            txtSecretFilter.TabIndex = 12;
             // 
             // panelValue
             // 
@@ -388,12 +408,14 @@
         private ToolStripSeparator menuSeparator;
         private TableLayoutPanel mainTableLayoutPanel;
         private ListBox lbSecrets;
+        private TextBox txtSecretFilter;
         private ListBox lbSubs;
         private Label lblValue;
         private Label lblSecrets;
         private Label lblKeyvaults;
         private Label lblSubscriptions;
         private ToolStripMenuItem connectToolStripMenuItem;
+        private ToolStripMenuItem refreshToolStripMenuItem;
         private StatusStrip statusBar;
         private ToolStripProgressBar progressBar;
         private ToolStripStatusLabel statusLabel;
