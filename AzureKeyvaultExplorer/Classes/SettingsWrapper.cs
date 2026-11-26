@@ -39,5 +39,14 @@ namespace AzureKeyvaultExplorer.Classes
             get => _settings.TOTP;
             set => _settings.TOTP = value;
         }
+
+        [Category("Misc")]
+        [Description("Connect automatically when the application starts and reselect the last used subscription")]
+        [DisplayName("Connect On Startup")]
+        public bool AutoConnect
+        {
+            get => _settings.AutoConnect;
+            set => _settings.AutoConnect = value;
+        }
     }
 }

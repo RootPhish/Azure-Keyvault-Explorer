@@ -20,14 +20,16 @@ namespace Library
         /// Streams secret names one page at a time (Key Vault returns at most 25 per page and pages
         /// must be fetched sequentially), so callers can show results while the rest is still loading.
         /// </summary>
-        public async IAsyncEnumerable<IReadOnlyList<string>> GetSecretPagesAsync(
+        public async IAsyncEnumerable<IReadOnlyList<SecretListItem>> GetSecretPagesAsync(
             Uri vaultUri,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var pages = GetClient(vaultUri).GetPropertiesOfSecretsAsync(cancellationToken).AsPages();
             await foreach (Page<SecretProperties> page in pages.WithCancellation(cancellationToken))
             {
-                yield return page.Values.Select(p => p.Name).ToList();
+                yield return page.Values
+                    .Select(p => new SecretListItem { Name = p.Name, Enabled = p.Enabled ?? true })
+                    .ToList();
             }
         }
 

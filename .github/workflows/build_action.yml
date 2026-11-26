@@ -23,6 +23,10 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    - name: Determine version from tag
+      shell: pwsh
+      run: echo "APP_VERSION=$('${{ github.ref_name }}'.TrimStart('v'))" >> $env:GITHUB_ENV
+
     - name: Clean previous builds
       run: dotnet clean ${{ matrix.project }}/${{ matrix.project }}.csproj
         --configuration Release
@@ -37,6 +41,7 @@ jobs:
         --runtime ${{ matrix.runtime }}
         --configuration Release
         --no-restore
+        --property:Version=${{ env.APP_VERSION }}
 
     - name: Publish
       run: dotnet publish ${{ matrix.project }}/${{ matrix.project }}.csproj
