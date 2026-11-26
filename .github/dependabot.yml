@@ -3,12 +3,6 @@
 
 version: 2
 updates:
-  # .NET SDK version (only has an effect once the repo contains a global.json)
-  - package-ecosystem: "dotnet-sdk"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-
   # NuGet packages of all projects in the solution
   - package-ecosystem: "nuget"
     directory: "/"
